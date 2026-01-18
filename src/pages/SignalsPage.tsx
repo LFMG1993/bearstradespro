@@ -70,9 +70,9 @@ const columns: ColumnDef<Signal>[] = [
 
 // 2. El Componente de Página
 export const SignalsPage = () => {
-    const { signals, loading } = useSignals();
+    const { signals, isLoading } = useSignals();
 
-    if (loading) return <div className="text-white text-center p-10">Cargando historial...</div>;
+    if (isLoading) return <div className="text-white text-center p-10">Cargando historial...</div>;
 
     return (
         <div className="space-y-6">
