@@ -1,9 +1,13 @@
-import api from '../api/axios';
+import { supabase } from '../lib/supabase';
 import type { Signal } from '../types';
 
-export const signalsService = {
-    getAll: async (): Promise<Signal[]> => {
-        const { data } = await api.get<Signal[]>('/signals');
-        return data;
-    }
+export const fetchSignals = async (): Promise<Signal[]> => {
+    const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+    if (error) throw new Error(error.message);
+    return data as Signal[];
 };

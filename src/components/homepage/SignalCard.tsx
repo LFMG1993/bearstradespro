@@ -1,48 +1,91 @@
 import React from 'react';
-import { Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, ShieldAlert, DollarSign } from 'lucide-react';
 import type { Signal } from '../../types';
 
 export const SignalCard: React.FC<{ signal: Signal }> = ({ signal }) => {
-    const isLong = signal.type === 'BUY';
+    const isBuy = signal.signal_type === 'BUY';
+    const isWon = signal.status === 'WON';
+    const isLost = signal.status === 'LOST';
+    const isActive = signal.status === 'ACTIVE';
+
+    // Colores dinámicos según estado
+    let borderColor = 'border-gray-700';
+    let bgColor = 'bg-gray-800/50';
+    let statusColor = 'text-gray-400';
+
+    if (isWon) {
+        borderColor = 'border-emerald-500/50';
+        bgColor = 'bg-emerald-900/20';
+        statusColor = 'text-emerald-400';
+    } else if (isLost) {
+        borderColor = 'border-rose-500/50';
+        bgColor = 'bg-rose-900/20';
+        statusColor = 'text-rose-400';
+    } else {
+        // Active
+        borderColor = isBuy ? 'border-emerald-500/30' : 'border-rose-500/30';
+    }
 
     return (
-        <div className="bg-gray-800/50 backdrop-blur-md border border-gray-700/50 rounded-xl p-4 mb-3 shadow-lg relative overflow-hidden">
-            {/* Indicador lateral de color */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1 ${isLong ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+        <div className={`relative rounded-xl border ${borderColor} ${bgColor} p-4 mb-3 transition-all duration-300`}>
 
-            <div className="flex justify-between items-start mb-2 pl-2">
-                <div>
-                    <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                        {signal.pair}
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${isLong ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-              {signal.type} {signal.entry_price}x
-            </span>
-                    </h3>
-                    {/* Nota: Asegúrate de que tu tipo Signal tenga timeAgo o calcúlalo aquí */}
-                    <p className="text-gray-400 text-xs mt-1">Entrada: <span className="text-gray-200">{signal.entry_price}</span></p>
+            {/* Encabezado: Par y Tipo */}
+            <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-2">
+                    <div className={`p-2 rounded-lg ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                        {isBuy ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                    </div>
+                    <div>
+                        <h3 className="text-white font-bold text-lg">{signal.symbol}</h3>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${isBuy ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                            {signal.signal_type} @ {signal.price}
+                        </span>
+                    </div>
                 </div>
+
+                {/* Estado Actual */}
                 <div className="text-right">
-                    {signal.status === 'ACTIVE' ? (
-                        <div className={`text-xl font-bold ${signal.result_pips > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {signal.result_pips > 0 ? '+' : ''}{signal.result_pips} pips
-                        </div>
-                    ) : (
-                        <div className="text-yellow-400 text-sm font-semibold flex items-center gap-1">
-                            <Zap size={14} /> {signal.status}
-                        </div>
+                    <div className={`text-sm font-bold flex items-center justify-end gap-1 ${statusColor}`}>
+                        {isActive && <span className="relative flex h-2 w-2 mr-1">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                        </span>}
+                        {signal.status}
+                    </div>
+                    {signal.updated_at && !isActive && (
+                        <span className="text-xs text-gray-500">Cerrada hace poco</span>
                     )}
                 </div>
             </div>
 
-            {/* Barra de progreso visual (Simulada) */}
-            {signal.status === 'ACTIVE' && (
-                <div className="w-full bg-gray-700 h-1.5 rounded-full mt-2 ml-2 pr-2">
-                    <div
-                        className={`h-1.5 rounded-full ${signal.result_pips > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}
-                        style={{ width: '50%' }} // Aquí podrías calcular el % real basado en TP/SL
-                    />
+            {/* Grid de Datos: TP, SL, Profit */}
+            <div className="grid grid-cols-3 gap-2 mt-2 bg-gray-900/40 p-2 rounded-lg border border-gray-700/30">
+                {/* Take Profit */}
+                <div className="flex flex-col items-center border-r border-gray-700/50">
+                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                        <Target size={10} /> TP (Meta)
+                    </span>
+                    <span className="text-emerald-400 font-mono font-bold text-sm">{signal.take_profit}</span>
                 </div>
-            )}
+
+                {/* Stop Loss */}
+                <div className="flex flex-col items-center border-r border-gray-700/50">
+                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                        <ShieldAlert size={10} /> SL (Riesgo)
+                    </span>
+                    <span className="text-rose-400 font-mono font-bold text-sm">{signal.stop_loss}</span>
+                </div>
+
+                {/* Ganancia Estimada */}
+                <div className="flex flex-col items-center">
+                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                        <DollarSign size={10} /> Potencial
+                    </span>
+                    <span className="text-yellow-400 font-mono font-bold text-sm">
+                        ${signal.estimated_profit?.toFixed(2) || '---'}
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };
