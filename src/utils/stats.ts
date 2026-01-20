@@ -38,3 +38,63 @@ export const calculateMonthlyStats = (signals: Signal[]) => {
         trend: totalProfit >= 0 ? 'up' : 'down' // Si es positivo, flechita arriba
     };
 };
+
+// Nueva interfaz para las estadísticas por símbolo
+export interface SymbolStat {
+    symbol: string;
+    winRate: number;
+    totalTrades: number;
+    wins: number;
+    losses: number;
+    netProfit: number;
+}
+
+export const calculateSymbolStats = (signals: Signal[], date: Date = new Date()): SymbolStat[] => {
+    const targetMonth = date.getMonth();
+    const targetYear = date.getFullYear();
+
+    // 1. Filtrar solo señales del mes actual y que estén cerradas (WON/LOST)
+    const monthlySignals = signals.filter(s => {
+        const signalDate = new Date(s.created_at);
+        return signalDate.getMonth() === targetMonth &&
+            signalDate.getFullYear() === targetYear &&
+            (s.status === 'WON' || s.status === 'LOST');
+    });
+
+    // 2. Agrupar por símbolo
+    const groups: Record<string, Signal[]> = {};
+    monthlySignals.forEach(s => {
+        if (!groups[s.symbol]) groups[s.symbol] = [];
+        groups[s.symbol].push(s);
+    });
+
+    // 3. Calcular estadísticas por grupo
+    const stats: SymbolStat[] = Object.keys(groups).map(symbol => {
+        const group = groups[symbol];
+        const totalTrades = group.length;
+        const wins = group.filter(s => s.status === 'WON').length;
+        const losses = group.filter(s => s.status === 'LOST').length;
+
+        // Calcular profit neto del símbolo
+        const netProfit = group.reduce((acc, curr) => {
+            if (curr.status === 'WON') return acc + (curr.estimated_profit || 0);
+            if (curr.status === 'LOST') return acc - (curr.estimated_loss || 0);
+            return acc;
+        }, 0);
+
+        return {
+            symbol,
+            totalTrades,
+            wins,
+            losses,
+            winRate: totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0,
+            netProfit
+        };
+    });
+
+    // 4. Ordenar por Win Rate descendente (y luego por cantidad de trades para desempatar)
+    return stats.sort((a, b) => {
+        if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+        return b.totalTrades - a.totalTrades;
+    });
+};

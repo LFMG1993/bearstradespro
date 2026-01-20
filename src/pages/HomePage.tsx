@@ -1,11 +1,12 @@
-import { useMemo } from 'react'; // <--- IMPORTANTE
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { useSignals } from "../hooks/useSignals.ts";
-import { SignalCard } from '../components/homepage/SignalCard';
-import { AcademyCard } from '../components/homepage/AcademyCard';
-import { StatPill } from '../components/homepage/StatPill';
-import { calculateMonthlyStats } from '../utils/stats'; // <--- Importamos la lógica
-import type { Course } from '../types';
+import {useMemo} from 'react';
+import {ArrowRight, BookOpen} from 'lucide-react';
+import {useSignals} from "../hooks/useSignals.ts";
+import {SignalCard} from '../components/homepage/SignalCard';
+import {AcademyCard} from '../components/homepage/AcademyCard';
+import {StatPill} from '../components/homepage/StatPill';
+import {calculateMonthlyStats} from '../utils/stats';
+import {Link} from 'react-router-dom';
+import type {Course} from '../types';
 
 // Datos mock para cursos (esto sigue igual)
 const courses: Course[] = [
@@ -14,10 +15,9 @@ const courses: Course[] = [
 ];
 
 export default function TradingApp() {
-    const { signals, isLoading } = useSignals();
+    const {signals, isLoading} = useSignals();
 
     // 1. CALCULAMOS LAS ESTADÍSTICAS EN VIVO
-    // useMemo evita recalcular en cada render si 'signals' no ha cambiado
     const stats = useMemo(() => calculateMonthlyStats(signals), [signals]);
 
     // Formateador de dinero
@@ -36,9 +36,11 @@ export default function TradingApp() {
             <section>
                 <div className="flex justify-between items-end mb-4 px-1">
                     <h2 className="text-xl font-bold text-white">Rendimiento Mensual</h2>
-                    <button className="text-emerald-400 text-xs font-medium flex items-center gap-1 hover:text-emerald-300 transition">
+                    <Link
+                        to="/performance"
+                        className="text-emerald-400 text-xs font-medium flex items-center gap-1 hover:text-emerald-300 transition">
                         Ver todo <ArrowRight size={12}/>
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
@@ -60,7 +62,6 @@ export default function TradingApp() {
                     <StatPill
                         label="Señales"
                         value={stats.totalSignals.toString()}
-                        // Sin tendencia específica para el conteo, o puedes poner 'up' si hay actividad
                     />
                 </div>
             </section>
@@ -78,13 +79,15 @@ export default function TradingApp() {
                 <div className="space-y-3 min-h-[200px]">
                     {isLoading && (
                         <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div
+                                className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                             <p className="text-gray-500 text-xs animate-pulse">Sincronizando mercado...</p>
                         </div>
                     )}
 
                     {!isLoading && signals.length === 0 && (
-                        <div className="text-center py-12 bg-gray-800/30 rounded-xl border border-dashed border-gray-700 mx-1">
+                        <div
+                            className="text-center py-12 bg-gray-800/30 rounded-xl border border-dashed border-gray-700 mx-1">
                             <p className="text-gray-400 text-sm">Sin actividad reciente</p>
                             <p className="text-gray-600 text-xs mt-1">El bot está escaneando oportunidades</p>
                         </div>
@@ -96,10 +99,11 @@ export default function TradingApp() {
                     ))}
                 </div>
 
-                <button
-                    className="w-full mt-4 py-3 bg-gray-800/80 text-gray-300 text-sm font-medium rounded-xl border border-gray-700 hover:bg-gray-700 hover:text-white transition active:scale-[0.98]">
+                <Link
+                    to="/signals"
+                    className="block text-center w-full mt-4 py-3 bg-gray-800/80 text-gray-300 text-sm font-medium rounded-xl border border-gray-700 hover:bg-gray-700 hover:text-white transition active:scale-[0.98]">
                     Ver historial completo
-                </button>
+                </Link>
             </section>
 
             {/* 4. ACADEMIA */}
@@ -111,7 +115,8 @@ export default function TradingApp() {
                             <AcademyCard course={course}/>
                         </div>
                     ))}
-                    <div className="min-w-[100px] flex flex-col items-center justify-center bg-gray-800/30 rounded-lg border border-dashed border-gray-700 mr-4 snap-start cursor-pointer hover:bg-gray-800/50 transition shrink-0 ml-3">
+                    <div
+                        className="min-w-[100px] flex flex-col items-center justify-center bg-gray-800/30 rounded-lg border border-dashed border-gray-700 mr-4 snap-start cursor-pointer hover:bg-gray-800/50 transition shrink-0 ml-3">
                         <BookOpen className="text-gray-500 mb-2"/>
                         <span className="text-xs text-gray-500">Ver todo</span>
                     </div>

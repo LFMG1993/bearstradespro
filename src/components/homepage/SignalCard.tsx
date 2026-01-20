@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Target, ShieldAlert, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, ShieldAlert, Layers } from 'lucide-react';
 import type { Signal } from '../../types';
 
 export const SignalCard: React.FC<{ signal: Signal }> = ({ signal }) => {
@@ -59,31 +59,42 @@ export const SignalCard: React.FC<{ signal: Signal }> = ({ signal }) => {
             </div>
 
             {/* Grid de Datos: TP, SL, Profit */}
-            <div className="grid grid-cols-3 gap-2 mt-2 bg-gray-900/40 p-2 rounded-lg border border-gray-700/30">
+            <div className="grid grid-cols-3 divide-x divide-gray-700/50 mt-2 bg-gray-900/40 rounded-lg border border-gray-700/30 overflow-hidden">
                 {/* Take Profit */}
-                <div className="flex flex-col items-center border-r border-gray-700/50">
-                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                        <Target size={10} /> TP (Meta)
+                <div className="flex flex-col items-center p-2 hover:bg-emerald-500/5 transition-colors">
+                     <span className="text-[10px] text-gray-400 font-bold mb-1 flex items-center gap-1">
+                          <Target size={10} /> TP
                     </span>
-                    <span className="text-emerald-400 font-mono font-bold text-sm">{signal.take_profit}</span>
+                    <span className="text-white font-mono font-bold text-lg leading-none">
+                         {Math.round(signal.take_profit)}
+                     </span>
+                    <span className="text-emerald-400 text-xs font-medium mt-1">
+                         +${signal.estimated_profit?.toFixed(2)}
+                     </span>
                 </div>
 
                 {/* Stop Loss */}
-                <div className="flex flex-col items-center border-r border-gray-700/50">
-                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                        <ShieldAlert size={10} /> SL (Riesgo)
+                <div className="flex flex-col items-center p-2 hover:bg-rose-500/5 transition-colors">
+                     <span className="text-[10px] text-gray-400 font-bold mb-1 flex items-center gap-1">
+                         <ShieldAlert size={10} /> SL
                     </span>
-                    <span className="text-rose-400 font-mono font-bold text-sm">{signal.stop_loss}</span>
+                    <span className="text-white font-mono font-bold text-lg leading-none">
+                         {Math.round(signal.stop_loss)}
+                     </span>
+                    <span className="text-rose-400 text-xs font-medium mt-1">
+                         -${signal.estimated_loss?.toFixed(2)}
+                    </span>
                 </div>
 
-                {/* Ganancia Estimada */}
-                <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                        <DollarSign size={10} /> Potencial
+                {/* Lotaje */}
+                <div className="flex flex-col items-center justify-center p-2">
+                     <span className="text-[10px] text-gray-400 font-bold mb-1 flex items-center gap-1">
+                         <Layers size={10} /> Lotaje
                     </span>
-                    <span className="text-yellow-400 font-mono font-bold text-sm">
-                        ${signal.estimated_profit?.toFixed(2) || '---'}
+                    <span className="text-yellow-400 font-mono font-bold text-lg leading-none">
+                         {signal.lotage}
                     </span>
+                    <span className="text-gray-500 text-[10px] mt-1">Lots</span>
                 </div>
             </div>
         </div>

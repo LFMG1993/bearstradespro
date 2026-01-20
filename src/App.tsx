@@ -1,9 +1,16 @@
+import {useEffect} from "react";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {useAuthStore} from './stores/useAuthStore';
+import {AuthGuard} from './components/auth/AuthGuard';
 import {Analytics} from "./components/general/Analytics.tsx";
 import {MainLayout} from "./components/general/MainLayout.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import {SignalsPage} from "./pages/SignalsPage.tsx";
+import {PerformancePage} from "./pages/PerformancePage.tsx";
+import {LoginPage} from "./pages/LoginPage.tsx";
+import {RegisterPage} from "./pages/RegisterPage.tsx";
+import {ProfilePage} from "./pages/ProfilePage.tsx";
 
 // Componente temporal para las páginas que aún no hemos creado
 const PlaceholderPage = ({title}: { title: string }) => (
@@ -26,20 +33,32 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+    const initializeAuth = useAuthStore(state => state.initializeAuth);
+
+    useEffect(() => {
+        initializeAuth();
+    }, []);
+
     return (
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-                <Analytics/>
-                <Routes>
-                    {/* El MainLayout envuelve a todas las rutas hijas */}
-                    <Route path="/" element={<MainLayout/>}>
-                        <Route index element={<HomePage/>}/>
-                        <Route path="signals" element={<SignalsPage/>}/>
-                        <Route path="trade" element={<PlaceholderPage title="Trading"/>}/>
-                        <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
-                        <Route path="profile" element={<PlaceholderPage title="Perfil"/>}/>
-                    </Route>
-                </Routes>
+                <AuthGuard>
+                    <Analytics/>
+                    <Routes>
+                        {/* Rutas Públicas (Auth) - Sin Layout para que no salga el menú */}
+                        <Route path="/login" element={<LoginPage/>}/>
+                        <Route path="/register" element={<RegisterPage/>}/>
+                        {/* El MainLayout envuelve a todas las rutas hijas */}
+                        <Route path="/" element={<MainLayout/>}>
+                            <Route index element={<HomePage/>}/>
+                            <Route path="signals" element={<SignalsPage/>}/>
+                            <Route path="trade" element={<PlaceholderPage title="Trading"/>}/>
+                            <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
+                            <Route path="profile" element={<ProfilePage/>}/>
+                            <Route path="performance" element={<PerformancePage/>}/>
+                        </Route>
+                    </Routes>
+                </AuthGuard>
             </BrowserRouter>
         </QueryClientProvider>
     );

@@ -1,23 +1,47 @@
-import api from '../api/axios';
-import type { AuthResponse, LoginCredentials } from '../types';
+import { supabase } from '../lib/supabase';
+import type { LoginCredentials } from '../types';
 
 export const authService = {
-    login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-        // POST /api/login
-        const { data } = await api.post<AuthResponse>('/login', credentials);
-
-        // Si el login es exitoso, guardamos el token
-        if (data.status === 'success' && data.token) {
-            localStorage.setItem('token', data.token);
-            // Opcional: Guardar info del usuario
-            localStorage.setItem('user', data.user);
-        }
-
+    // Login con Email y Contraseña
+    login: async ({ email, password }: LoginCredentials) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+        if (error) throw error;
         return data;
     },
 
-    logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+    // Registro (Importante: enviamos full_name para el Trigger de la DB)
+    register: async ({ email, password, fullName, phone }: LoginCredentials & { fullName: string; phone: string }) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName, // Esto lo lee el trigger handle_new_user
+                    phone: phone,
+                },
+            },
+        });
+        if (error) throw error;
+        return data;
+    },
+
+    // Login Social con Google
+    loginWithGoogle: async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin, // Redirige al Home después del login
+            },
+        });
+        if (error) throw error;
+        return data;
+    },
+
+    logout: async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     }
 };

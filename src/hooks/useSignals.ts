@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { fetchSignals } from '../services/signals.service';
+import { fetchSignals, fetchSignalsPaginated } from '../services/signals.service';
 import type { Signal } from '../types';
 
 export const useSignals = () => {
@@ -54,4 +54,22 @@ export const useSignals = () => {
     }, [queryClient]); // Dependencia segura
 
     return { signals, isLoading, error };
+};
+
+// Nuevo Hook para la Tabla con Paginación de Servidor
+export const usePaginatedSignals = (page: number, pageSize: number) => {
+    const QUERY_KEY = ['signals', 'paginated', page, pageSize];
+
+    const { data, isLoading, error } = useQuery({
+        queryKey: QUERY_KEY,
+        queryFn: () => fetchSignalsPaginated(page, pageSize),
+        placeholderData: keepPreviousData, // Mantiene la data anterior mientras carga la nueva (evita parpadeos)
+    });
+
+    return {
+        signals: data?.data || [],
+        totalCount: data?.count || 0,
+        isLoading,
+        error
+    };
 };

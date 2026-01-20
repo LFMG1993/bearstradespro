@@ -4,10 +4,6 @@ import { BarChart2, Zap, TrendingUp, PlayCircle, User } from 'lucide-react';
 
 export const MobileDock = () => {
     return (
-        // CAMBIOS IMPORTANTES EN EL className:
-        // 1. Quitamos 'left-0 right-0' (que estira todo).
-        // 2. Agregamos 'w-full max-w-2xl' (para coincidir con tu Layout).
-        // 3. Agregamos 'left-1/2 -translate-x-1/2' (para centrarlo en PC).
         <nav className="fixed bottom-0 z-50 w-full max-w-2xl left-1/2 -translate-x-1/2
                         bg-gray-900/90 backdrop-blur-xl border-t border-gray-800
                         pb-safe pt-2 px-6">
