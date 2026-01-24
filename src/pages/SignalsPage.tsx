@@ -83,14 +83,36 @@ const columns: ColumnDef<Signal>[] = [
         },
     },
     {
+        accessorKey: "realized_profit",
+        header: "Resultado",
+        cell: ({row}) => {
+            const profit = row.original.realized_profit;
+            // Si es null o undefined (operación activa), mostramos un guion
+            if (profit === null || profit === undefined) return <span className="text-gray-600 text-xs">-</span>;
+
+            const isPositive = profit >= 0;
+            return (
+                <span className={`font-mono font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                     {isPositive ? '+' : ''}{profit.toFixed(2)}
+                 </span>
+            );
+        },
+    },
+    {
         accessorKey: "created_at",
-        header: "Hora",
-        cell: ({row}) => (
-            <div className="flex items-center gap-1 text-gray-500 text-xs">
-                <Clock size={12}/>
-                {new Date(row.getValue("created_at")).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
-            </div>
-        ),
+        header: "Fecha",
+        cell: ({row}) => {
+            const date = new Date(row.getValue("created_at"));
+            return (
+                <div className="flex flex-col">
+                    <span className="text-[10px] text-gray-500 leading-tight">{date.toLocaleDateString()}</span>
+                    <div className="flex items-center gap-1 text-gray-300 text-xs">
+                        <Clock size={12}/>
+                        {date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                </div>
+            );
+        },
     },
 ];
 
@@ -102,7 +124,7 @@ export const SignalsPage = () => {
     const pageSize = 10;
 
     // Usamos el hook paginado. Cada vez que cambie 'currentPage', hace un fetch nuevo eficiente.
-    const { signals, totalCount, isLoading } = usePaginatedSignals(currentPage, pageSize);
+    const {signals, totalCount, isLoading} = usePaginatedSignals(currentPage, pageSize);
     const totalPages = Math.ceil(totalCount / pageSize);
 
     if (isLoading) return <div className="text-white text-center p-10">Cargando historial...</div>;

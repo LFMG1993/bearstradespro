@@ -1,4 +1,4 @@
-import type { Signal } from '../types';
+import type { Signal, SymbolStat } from '../types';
 
 export const calculateMonthlyStats = (signals: Signal[]) => {
     const now = new Date();
@@ -19,12 +19,12 @@ export const calculateMonthlyStats = (signals: Signal[]) => {
         // Solo contamos operaciones cerradas
         if (signal.status === 'WON') {
             wins++;
-            // Sumamos la ganancia estimada
-            totalProfit += (signal.estimated_profit || 0);
+            // Sumamos la ganancia REAL
+            totalProfit += (signal.realized_profit || 0);
         } else if (signal.status === 'LOST') {
             losses++;
-            // Restamos el riesgo (Asumiendo Ratio 1:2, el riesgo es la mitad del profit)
-            totalProfit -= ((signal.estimated_profit || 0) / 2);
+            // Sumamos la pérdida REAL (que ya viene negativa en la DB)
+            totalProfit += (signal.realized_profit || 0);
         }
     });
 
@@ -38,16 +38,6 @@ export const calculateMonthlyStats = (signals: Signal[]) => {
         trend: totalProfit >= 0 ? 'up' : 'down' // Si es positivo, flechita arriba
     };
 };
-
-// Nueva interfaz para las estadísticas por símbolo
-export interface SymbolStat {
-    symbol: string;
-    winRate: number;
-    totalTrades: number;
-    wins: number;
-    losses: number;
-    netProfit: number;
-}
 
 export const calculateSymbolStats = (signals: Signal[], date: Date = new Date()): SymbolStat[] => {
     const targetMonth = date.getMonth();
@@ -77,9 +67,7 @@ export const calculateSymbolStats = (signals: Signal[], date: Date = new Date())
 
         // Calcular profit neto del símbolo
         const netProfit = group.reduce((acc, curr) => {
-            if (curr.status === 'WON') return acc + (curr.estimated_profit || 0);
-            if (curr.status === 'LOST') return acc - (curr.estimated_loss || 0);
-            return acc;
+            return acc + (curr.realized_profit || 0);
         }, 0);
 
         return {

@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {Toaster} from "react-hot-toast";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {useAuthStore} from './stores/useAuthStore';
@@ -11,6 +12,8 @@ import {PerformancePage} from "./pages/PerformancePage.tsx";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
 import {ProfilePage} from "./pages/ProfilePage.tsx";
+import {TradingPlanPage} from "./pages/TradingPlanPage.tsx"
+import {NotificationsProvider} from "./context/NotificationsContext.tsx";
 
 // Componente temporal para las páginas que aún no hemos creado
 const PlaceholderPage = ({title}: { title: string }) => (
@@ -41,25 +44,35 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-                <AuthGuard>
-                    <Analytics/>
-                    <Routes>
-                        {/* Rutas Públicas (Auth) - Sin Layout para que no salga el menú */}
-                        <Route path="/login" element={<LoginPage/>}/>
-                        <Route path="/register" element={<RegisterPage/>}/>
-                        {/* El MainLayout envuelve a todas las rutas hijas */}
-                        <Route path="/" element={<MainLayout/>}>
-                            <Route index element={<HomePage/>}/>
-                            <Route path="signals" element={<SignalsPage/>}/>
-                            <Route path="trade" element={<PlaceholderPage title="Trading"/>}/>
-                            <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
-                            <Route path="profile" element={<ProfilePage/>}/>
-                            <Route path="performance" element={<PerformancePage/>}/>
-                        </Route>
-                    </Routes>
-                </AuthGuard>
-            </BrowserRouter>
+            <NotificationsProvider>
+                <BrowserRouter>
+                    <AuthGuard>
+                        <Analytics/>
+                        <Routes>
+                            <Route path="/login" element={<LoginPage/>}/>
+                            <Route path="/register" element={<RegisterPage/>}/>
+                            <Route path="/" element={<MainLayout/>}>
+                                <Route index element={<HomePage/>}/>
+                                <Route path="signals" element={<SignalsPage/>}/>
+                                <Route path="trade" element={<TradingPlanPage/>}/>
+                                <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
+                                <Route path="profile" element={<ProfilePage/>}/>
+                                <Route path="performance" element={<PerformancePage/>}/>
+                            </Route>
+                        </Routes>
+                        <Toaster
+                            position="top-right"
+                            reverseOrder={false}
+                            toastOptions={{
+                                style: {
+                                    background: '#333',
+                                    color: '#fff',
+                                },
+                            }}
+                        />
+                    </AuthGuard>
+                </BrowserRouter>
+            </NotificationsProvider>
         </QueryClientProvider>
     );
 }

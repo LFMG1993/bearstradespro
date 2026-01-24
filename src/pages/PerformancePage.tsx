@@ -86,9 +86,9 @@ export const PerformancePage = () => {
                             <div className="h-8 w-px bg-gray-700 mx-2"></div>
                             <div className="flex flex-col pb-1">
                                 <span className="text-gray-400 text-xs">Beneficio</span>
-                                <span className="text-emerald-400 font-mono font-bold">
-                                    +${bestPerformer.netProfit.toFixed(2)}
-                                </span>
+                                <span className={`font-mono font-bold ${bestPerformer.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                     {bestPerformer.netProfit >= 0 ? '+' : ''}${bestPerformer.netProfit.toFixed(2)}
+                                 </span>
                             </div>
                         </div>
                     </div>
