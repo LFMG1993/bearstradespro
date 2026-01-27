@@ -11,7 +11,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();
 
     // Rutas públicas que no requieren bloqueo nunca (ej: Login, Landing page pública)
-    const publicRoutes = ['/login', '/register', '/forgot-password'];
+    const publicRoutes = ['/login', '/register', '/forgot-password', '/privacy', '/risk-disclaimer'];
 
     useEffect(() => {
         // Si ya está logueado o es ruta pública, no hacemos nada

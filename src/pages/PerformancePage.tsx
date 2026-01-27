@@ -1,12 +1,32 @@
-import { useMemo, useState } from 'react';
-import { useSignals } from '../hooks/useSignals';
+import { useMemo, useState, useEffect } from 'react';
+import { fetchSignalsByMonth } from '../services/signals.service';
 import { calculateSymbolStats } from '../utils/stats';
 import { Trophy, Activity, ArrowLeft, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import type { Signal } from '../types';
 
 export const PerformancePage = () => {
-    const { signals, isLoading } = useSignals();
+    const [signals, setSignals] = useState<Signal[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(new Date());
+
+    // Hook que se dispara cada vez que `selectedDate` cambia
+    useEffect(() => {
+        const loadSignalsForMonth = async () => {
+            setIsLoading(true);
+            try {
+                const data = await fetchSignalsByMonth(selectedDate);
+                setSignals(data);
+            } catch (error) {
+                console.error("Error al cargar señales del mes:", error);
+                setSignals([]); // Limpiar en caso de error
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadSignalsForMonth();
+    }, [selectedDate]); // La dependencia clave: se re-ejecuta al cambiar el mes
+
 
     // Funciones para navegar entre meses
     const changeMonth = (offset: number) => {

@@ -11,11 +11,12 @@ import {SignalsPage} from "./pages/SignalsPage.tsx";
 import {PerformancePage} from "./pages/PerformancePage.tsx";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
+import {PrivacyPage} from "./pages/PrivacyPage.tsx";
+import {RiskDisclaimerPage} from "./pages/RiskDisclaimerPage.tsx";
 import {ProfilePage} from "./pages/ProfilePage.tsx";
 import {TradingPlanPage} from "./pages/TradingPlanPage.tsx"
 import {NotificationsProvider} from "./context/NotificationsContext.tsx";
 
-// Componente temporal para las páginas que aún no hemos creado
 const PlaceholderPage = ({title}: { title: string }) => (
     <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
         <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
@@ -51,6 +52,8 @@ function App() {
                         <Routes>
                             <Route path="/login" element={<LoginPage/>}/>
                             <Route path="/register" element={<RegisterPage/>}/>
+                            <Route path="/privacy" element={<PrivacyPage/>}/>
+                            <Route path="/risk-disclaimer" element={<RiskDisclaimerPage/>}/>
                             <Route path="/" element={<MainLayout/>}>
                                 <Route index element={<HomePage/>}/>
                                 <Route path="signals" element={<SignalsPage/>}/>

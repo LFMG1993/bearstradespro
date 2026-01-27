@@ -30,6 +30,27 @@ export const fetchSignals = async (): Promise<Signal[]> => {
 };
 
 // Nueva función para paginación eficiente en el servidor
+export const fetchSignalsByMonth = async (date: Date): Promise<Signal[]> => {
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-11
+
+    // Primer día del mes seleccionado
+    const startDate = new Date(year, month, 1).toISOString();
+    // Último día del mes seleccionado (truco: día 0 del mes siguiente)
+    const endDate = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+
+    const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .gte('created_at', startDate) // gte = Greater Than or Equal
+        .lte('created_at', endDate)   // lte = Less Than or Equal
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return data as Signal[];
+};
+
+// Nueva función para paginación eficiente en el servidor
 export const fetchSignalsPaginated = async (page: number, pageSize: number): Promise<{ data: Signal[], count: number }> => {
     const from = page * pageSize;
     const to = from + pageSize - 1;
