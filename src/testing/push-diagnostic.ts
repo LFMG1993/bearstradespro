@@ -101,7 +101,7 @@ export const pushDiagnostics = {
             });
 
             registration.active.postMessage(
-                { type: 'PING' },
+                {type: 'PING'},
                 [messageChannel.port2]
             );
 
@@ -154,9 +154,21 @@ export const pushDiagnostics = {
      */
     async testVapidKey() {
         console.log('\n=== TEST 5: VAPID Key Validation ===\n');
-
+        const BACKEND_URL = "https://backend-worker-ts.fwwdy8w44g.workers.dev";
         try {
-            const response = await fetch('/api/push/vapid-public-key');
+            console.log(`📡 Fetching from: ${BACKEND_URL}/api/push/vapid-public-key`);
+
+            const response = await fetch(`${BACKEND_URL}/api/push/vapid-public-key`);
+
+            // Verificamos primero el Content-Type para evitar el error de JSON
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                console.error(`❌ El servidor no devolvió JSON. Devolvió: ${contentType}`);
+                console.error(`   Contenido (primeros 100 chars): ${text.substring(0, 100)}...`);
+                return false;
+            }
+
             const data = await response.json();
 
             if (response.status !== 200) {
@@ -164,7 +176,13 @@ export const pushDiagnostics = {
                 return false;
             }
 
-            const { publicKey } = data;
+            const {publicKey} = data;
+
+            if (!publicKey) {
+                console.error('❌ El JSON no tiene la propiedad "publicKey":', data);
+                return false;
+            }
+
             console.log('📥 VAPID Key:', publicKey.slice(0, 20) + '...');
             console.log('   Length:', publicKey.length);
 
