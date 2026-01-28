@@ -5,7 +5,7 @@ export const pushService = {
      * Obtiene la clave pública VAPID del servidor para iniciar el proceso de suscripción.
      */
     async getVapidPublicKey(): Promise<string> {
-        const response = await fetch(`${API_URL}/vapid-public-key`);
+        const response = await fetch(`${API_URL}/api/push/vapid-public-key`);
         if (!response.ok) {
             throw new Error('No se pudo obtener la VAPID key del servidor.');
         }
@@ -17,7 +17,7 @@ export const pushService = {
      * Envía la suscripción generada por el navegador y el ID del usuario al backend.
      */
     async saveSubscription(userId: string, subscription: PushSubscription): Promise<void> {
-        const response = await fetch(`${API_URL}/subscribe`, {
+        const response = await fetch(`${API_URL}/api/push/subscribe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
