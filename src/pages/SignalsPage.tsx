@@ -17,6 +17,35 @@ const columns: ColumnDef<Signal>[] = [
         ),
     },
     {
+        accessorKey: "status",
+        header: "Estado",
+        cell: ({row}) => {
+            const status = row.getValue("status") as string;
+            const colors = {
+                ACTIVE: "text-blue-400",
+                WON: "text-emerald-400 font-bold",
+                LOST: "text-rose-400 font-bold"
+            };
+            return <span className={colors[status as keyof typeof colors] || "text-gray-400"}>{status}</span>;
+        },
+    },
+    {
+        accessorKey: "realized_profit",
+        header: "Resultado",
+        cell: ({row}) => {
+            const profit = row.original.realized_profit;
+            // Si es null o undefined (operación activa), mostramos un guion
+            if (profit === null || profit === undefined) return <span className="text-gray-600 text-xs">-</span>;
+
+            const isPositive = profit >= 0;
+            return (
+                <span className={`font-mono font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                     {isPositive ? '+' : ''}{profit.toFixed(2)}
+                 </span>
+            );
+        },
+    },
+    {
         accessorKey: "signal_type",
         header: "Tipo",
         cell: ({row}) => {
@@ -68,35 +97,6 @@ const columns: ColumnDef<Signal>[] = [
                  </span>
             </div>
         ),
-    },
-    {
-        accessorKey: "status",
-        header: "Estado",
-        cell: ({row}) => {
-            const status = row.getValue("status") as string;
-            const colors = {
-                ACTIVE: "text-blue-400",
-                WON: "text-emerald-400 font-bold",
-                LOST: "text-rose-400 font-bold"
-            };
-            return <span className={colors[status as keyof typeof colors] || "text-gray-400"}>{status}</span>;
-        },
-    },
-    {
-        accessorKey: "realized_profit",
-        header: "Resultado",
-        cell: ({row}) => {
-            const profit = row.original.realized_profit;
-            // Si es null o undefined (operación activa), mostramos un guion
-            if (profit === null || profit === undefined) return <span className="text-gray-600 text-xs">-</span>;
-
-            const isPositive = profit >= 0;
-            return (
-                <span className={`font-mono font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                     {isPositive ? '+' : ''}{profit.toFixed(2)}
-                 </span>
-            );
-        },
     },
     {
         accessorKey: "created_at",

@@ -1,8 +1,3 @@
-// public/sw.js - Service Worker para Push Notifications
-// Este archivo DEBE estar en la carpeta public/ para ser servido desde /sw.js
-
-console.log('[SW] Service Worker cargando...');
-
 // 1. Event: install
 self.addEventListener('install', (event) => {
     console.log('[SW] Install event - forzando activación');

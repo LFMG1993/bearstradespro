@@ -1,6 +1,8 @@
 import { supabase } from '../lib/supabase';
 import type { LoginCredentials } from '../types';
 
+const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID;
+
 export const authService = {
     // Login con Email y Contraseña
     login: async ({ email, password }: LoginCredentials) => {
@@ -13,14 +15,23 @@ export const authService = {
     },
 
     // Registro (Importante: enviamos full_name para el Trigger de la DB)
-    register: async ({ email, password, fullName, phone }: LoginCredentials & { fullName: string; phone: string }) => {
+    register: async ({ email, password, fullName, phone, organizationId }: LoginCredentials & { fullName: string; phone: string; organizationId?: string }) => {
+
+        const targetOrgId = organizationId || DEFAULT_ORG_ID;
+
+        if (!targetOrgId) {
+            console.error("❌ No organization ID defined for registration");
+            throw new Error("Error de configuración: Sin ID de organización");
+        }
+
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
-                    full_name: fullName, // Esto lo lee el trigger handle_new_user
+                    full_name: fullName,
                     phone: phone,
+                    organization_id: targetOrgId
                 },
             },
         });
@@ -33,7 +44,11 @@ export const authService = {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin, // Redirige al Home después del login
+                redirectTo: window.location.origin,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
             },
         });
         if (error) throw error;
