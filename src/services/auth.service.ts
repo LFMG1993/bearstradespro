@@ -15,7 +15,7 @@ export const authService = {
     },
 
     // Registro (Importante: enviamos full_name para el Trigger de la DB)
-    register: async ({ email, password, fullName, phone, organizationId }: LoginCredentials & { fullName: string; phone: string; organizationId?: string }) => {
+    register: async ({ email, password, fullName, phone, organizationId, planCode }: LoginCredentials & { fullName: string; phone: string; organizationId?: string; planCode?: string }) => {
 
         const targetOrgId = organizationId || DEFAULT_ORG_ID;
 
@@ -31,7 +31,8 @@ export const authService = {
                 data: {
                     full_name: fullName,
                     phone: phone,
-                    organization_id: targetOrgId
+                    organizationId: targetOrgId,
+                    planCode: planCode || 'pro',
                 },
             },
         });

@@ -5,6 +5,7 @@ export interface UserProfile {
     organization_id: string;
     roles?: string[]; // Nombres de roles para facilitar UI
     phone?: string;
+    subscription_status?: string;
     trial_ends_at?: string;
     plan_type?: string;
     avatar_url?: string;

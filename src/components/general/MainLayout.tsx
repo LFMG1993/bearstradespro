@@ -6,6 +6,7 @@ import {useAuthStore} from '../../stores/useAuthStore';
 import {useNotifications} from '../../context/NotificationsContext';
 import {PushNotificationToggler} from "./PushNotificationToggler.tsx";
 import {InstallPWA} from "./InstallPWA.tsx";
+import {UpdatePWA} from "./UpdatePWA.tsx";
 import bearsBlack from '../../assets/bears_black.gif';
 
 export const MainLayout = () => {
@@ -152,6 +153,7 @@ export const MainLayout = () => {
                 </main>
                 <MobileDock/>
                 <InstallPWA/>
+                <UpdatePWA/>
             </div>
         </div>
     );

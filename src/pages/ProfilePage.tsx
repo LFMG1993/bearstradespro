@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {useAuthStore} from '../stores/useAuthStore';
-import {User, Phone, LogOut, Save, AlertCircle, CheckCircle, Crown, Mail} from 'lucide-react';
+import {User, Phone, LogOut, Save, AlertCircle, CheckCircle, Crown, Mail, CreditCard} from 'lucide-react';
 import {profileService} from '../services/profile.service';
 import {formatDistanceToNow} from 'date-fns';
+import {paymentService} from '../services/payment.service';
 import {es} from 'date-fns/locale';
 
 export const ProfilePage = () => {
@@ -45,6 +46,26 @@ export const ProfilePage = () => {
         }
     };
 
+    const handleSubscribe = async () => {
+        if (!profile || !profile.organization_id) {
+            setError("No se encontró información de tu organización.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Asumimos plan 'pro' por defecto para la prueba, o podrías tener un selector
+            const data = await paymentService.createPreference('pro', profile.organization_id);
+
+            // Redirigir a Mercado Pago
+            const url = data.sandbox_init_point || data.init_point;
+            window.location.href = url;
+        } catch (err: any) {
+            setError(err.message || "Error al iniciar el pago.");
+            setLoading(false);
+        }
+    };
+
     const handleLogout = async () => {
         await signOut();
         // El listener onAuthStateChange se encargará de redirigir o limpiar el estado.
@@ -56,6 +77,12 @@ export const ProfilePage = () => {
 
     const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
     const isTrialActive = trialEndsAt && trialEndsAt > new Date();
+
+    // Lógica para determinar si necesita pagar
+    // Si NO es trial activo Y (está vencido O el estado no es active)
+    const needsPayment = !isTrialActive && (profile.subscription_status !== 'active' || (trialEndsAt && trialEndsAt < new Date()));
+    const showSubscribeButton = needsPayment || isTrialActive;
+
 
     return (
         <div className="space-y-8">
@@ -98,6 +125,25 @@ export const ProfilePage = () => {
                         </div>
                     )}
                 </div>
+                {/* Botón de Pago MercadoPago (Solo si necesita pagar) */}
+                {showSubscribeButton && (
+                    <div className="mt-6 pt-6 border-t border-gray-700">
+                        <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl mb-4">
+                            <p className="text-blue-400 text-sm mb-2">
+                                {isTrialActive
+                                    ? "Estás en tu periodo de prueba. Suscríbete ahora para asegurar tu acceso."
+                                    : "Tu suscripción ha finalizado o está inactiva."}
+                            </p>
+                            <button
+                                onClick={handleSubscribe}
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <CreditCard size={18} />
+                                {loading ? 'Procesando...' : 'Suscribirse con MercadoPago'}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Edit Profile Form */}

@@ -22,7 +22,16 @@ interface NotificationsContextType {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
-    const [notifications, setNotifications] = useState<AppNotification[]>([]);
+    const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+        const saved = localStorage.getItem('bears_notifications');
+        if (saved) {
+            try {
+                // Recuperar y convertir los strings de fecha a objetos Date reales
+                return JSON.parse(saved).map((n: any) => ({ ...n, timestamp: new Date(n.timestamp) }));
+            } catch (e) { return []; }
+        }
+        return [];
+    });
 
     // Calculamos no leídas
     const unreadCount = notifications.filter(n => !n.read).length;
@@ -33,6 +42,12 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
             return newList.slice(0, 5); // Mantenemos solo las últimas 5
         });
     };
+
+    // Guardar en localStorage cada vez que cambian las notificaciones
+    useEffect(() => {
+        localStorage.setItem('bears_notifications', JSON.stringify(notifications));
+    }, [notifications]);
+
 
     const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({...n, read: true})));
