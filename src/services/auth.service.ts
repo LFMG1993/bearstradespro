@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import type { LoginCredentials } from '../types';
 
-const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID;
+const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID || import.meta.env.VITE_ORG_ID;
 
 export const authService = {
     // Login con Email y Contraseña
