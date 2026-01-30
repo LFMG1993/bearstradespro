@@ -19,7 +19,8 @@ export const paymentService = {
             body: JSON.stringify({
                 userId: session.user.id,
                 planCode,
-                organizationId
+                organizationId,
+                redirectBaseUrl: window.location.origin
             })
         });
 

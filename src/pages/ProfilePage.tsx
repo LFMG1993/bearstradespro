@@ -76,12 +76,14 @@ export const ProfilePage = () => {
     }
 
     const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
-    const isTrialActive = trialEndsAt && trialEndsAt > new Date();
+    // Es válido si la fecha es futura
+    const isAccessValid = trialEndsAt && trialEndsAt > new Date();
 
-    // Lógica para determinar si necesita pagar
-    // Si NO es trial activo Y (está vencido O el estado no es active)
-    const needsPayment = !isTrialActive && (profile.subscription_status !== 'active' || (trialEndsAt && trialEndsAt < new Date()));
-    const showSubscribeButton = needsPayment || isTrialActive;
+    // Estados específicos
+    const isTrial = profile.subscription_status === 'trialing';
+    const isPaidActive = profile.subscription_status === 'active';
+
+    const showSubscribeButton = isTrial || !isPaidActive || !isAccessValid;
 
 
     return (
@@ -116,7 +118,7 @@ export const ProfilePage = () => {
                             {profile.plan_type?.replace('_', ' ') || 'N/A'}
                         </p>
                     </div>
-                    {isTrialActive && trialEndsAt && (
+                    {isTrial && isAccessValid && (
                         <div>
                             <p className="text-gray-400 text-sm text-right">Vence en</p>
                             <p className="text-white font-mono font-bold">
@@ -124,13 +126,19 @@ export const ProfilePage = () => {
                             </p>
                         </div>
                     )}
+                    {isPaidActive && isAccessValid && (
+                        <span
+                            className="ml-auto text-xs bg-blue-500/10 text-blue-500 px-2 py-1 rounded-full border border-blue-500/20">
+                                 Premium
+                             </span>
+                    )}
                 </div>
                 {/* Botón de Pago MercadoPago (Solo si necesita pagar) */}
                 {showSubscribeButton && (
                     <div className="mt-6 pt-6 border-t border-gray-700">
                         <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl mb-4">
                             <p className="text-blue-400 text-sm mb-2">
-                                {isTrialActive
+                                {isTrial
                                     ? "Estás en tu periodo de prueba. Suscríbete ahora para asegurar tu acceso."
                                     : "Tu suscripción ha finalizado o está inactiva."}
                             </p>
@@ -138,7 +146,7 @@ export const ProfilePage = () => {
                                 onClick={handleSubscribe}
                                 disabled={loading}
                                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <CreditCard size={18} />
+                                <CreditCard size={18}/>
                                 {loading ? 'Procesando...' : 'Suscribirse con MercadoPago'}
                             </button>
                         </div>
