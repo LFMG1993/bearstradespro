@@ -4,4 +4,6 @@ export * from './courses.types.ts';
 export * from './profile.type.ts';
 export * from './organization.type.ts';
 export * from './tradingPlan.type.ts';
-export * from './adminUser.types.ts'
+export * from './adminUser.types.ts';
+export * from './plan.types.ts';
+export * from './subscription.types.ts';

@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Building2, CreditCard, LogOut } from 'lucide-react';
+import {LayoutDashboard, Users, Building2, CreditCard, LogOut, Layers} from 'lucide-react';
 import { authService } from '../../../services/auth.service';
 
 export default function AdminLayout() {
@@ -8,7 +8,8 @@ export default function AdminLayout() {
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
         { icon: Building2, label: 'Organizaciones', path: '/admin/orgs' },
-        { icon: CreditCard, label: 'Planes & Subs', path: '/admin/subscriptions' },
+        { icon: Layers, label: 'Planes', path: '/admin/plans' },
+        { icon: CreditCard, label: 'Suscripciones', path: '/admin/subscriptions' },
         { icon: Users, label: 'Usuarios Globales', path: '/admin/users' },
     ];
 

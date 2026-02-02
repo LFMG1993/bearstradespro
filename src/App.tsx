@@ -19,10 +19,11 @@ import {ProfilePage} from "./pages/ProfilePage.tsx";
 import {TradingPlanPage} from "./pages/TradingPlanPage.tsx"
 import {NotificationsProvider} from "./context/NotificationsContext.tsx";
 import AdminLayout from "./components/admin/general/AdminLayout.tsx";
-import AdminSubscriptionPanel from "./components/admin/subscriptions/AdminSubscriptionPanel.tsx";
 import {AdminDashboard} from "./pages/admin/DashboardPage.tsx";
 import {AdminLoginPage} from "./pages/admin/AdminLoginPage.tsx";
 import {AdminUsersPage} from "./pages/admin/AdminUsersPage.tsx";
+import {AdminPlansPage} from "./pages/admin/AdminPlansPage.tsx";
+import {AdminSubscriptionsPage} from "./pages/admin/AdminSubscriptionsPage.tsx";
 
 const PlaceholderPage = ({title}: { title: string }) => (
     <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
@@ -83,7 +84,8 @@ function App() {
                                     <Route path="/admin" element={<SuperAdminGuard><AdminLayout/></SuperAdminGuard>}>
                                         <Route path="/admin/users" element={<AdminUsersPage/>}/>
                                         <Route index element={<AdminDashboard/>}/>
-                                        <Route path="subscriptions" element={<AdminSubscriptionPanel/>}/>
+                                        <Route path="plans" element={<AdminPlansPage/>}/>
+                                        <Route path="subscriptions" element={<AdminSubscriptionsPage/>}/>
                                         <Route path="orgs"
                                                element={<PlaceholderPage title="Gestión de Organizaciones"/>}/>
                                     </Route>
