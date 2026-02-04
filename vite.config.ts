@@ -11,21 +11,13 @@ export default defineConfig({
             registerType: 'prompt',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
 
-            // ✅ AGREGAR ESTO
             strategies: 'injectManifest',
             srcDir: 'src',
             filename: 'service-worker.ts',
-            injectManifest: {
-                globPatterns: [
-                    '**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,eot}'
-                ]
-            },
 
-            workbox: {
-                cleanupOutdatedCaches: true,
-                skipWaiting: true,
-                clientsClaim: true,
-                navigateFallbackDenylist: [/^\/api/],
+            // Opciones para la inyección del manifiesto
+            injectManifest: {
+                maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
             },
 
             manifest: {
