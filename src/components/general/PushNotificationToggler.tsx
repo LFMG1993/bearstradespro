@@ -34,8 +34,7 @@ export const PushNotificationToggler = () => {
 
     if (status === 'granted') {
         return (
-            <div
-                className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400">
+            <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400">
                 <CheckCircle2 size={14}/>
                 <span>Notificaciones Activas</span>
             </div>

@@ -11,6 +11,11 @@ export default defineConfig({
             registerType: 'prompt',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
 
+            devOptions: {
+                enabled: true,
+                type: 'module', // Permite que el SW use imports en dev
+            },
+
             strategies: 'injectManifest',
             srcDir: 'src',
             filename: 'service-worker.ts',

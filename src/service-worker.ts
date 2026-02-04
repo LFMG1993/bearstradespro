@@ -28,6 +28,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 // 1. Event: push (CRÍTICO para push notifications)
 self.addEventListener('push', (event) => {
+    console.log('[SW] 📩 Evento Push Recibido en el navegador!');
     if (!event.data) return;
 
     let notificationData: any = {};
@@ -37,6 +38,8 @@ self.addEventListener('push', (event) => {
     } catch (e) {
         notificationData = { body: event.data.text() };
     }
+
+    console.log('[SW] 📦 Datos procesados:', notificationData);
 
     const title = notificationData.title || 'Nueva Notificación';
     const options: NotificationOptions = {
