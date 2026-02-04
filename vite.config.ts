@@ -13,9 +13,9 @@ export default defineConfig({
 
             // ✅ AGREGAR ESTO
             strategies: 'injectManifest',
+            srcDir: 'src',
+            filename: 'service-worker.ts',
             injectManifest: {
-                swSrc: 'src/service-worker.ts',
-                swDest: 'sw.js',
                 globPatterns: [
                     '**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,eot}'
                 ]
