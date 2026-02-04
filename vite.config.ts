@@ -10,13 +10,24 @@ export default defineConfig({
         VitePWA({
             registerType: 'prompt',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+
+            // ✅ AGREGAR ESTO
+            strategies: 'injectManifest',
+            injectManifest: {
+                swSrc: 'src/service-worker.ts',
+                swDest: 'sw.js',
+                globPatterns: [
+                    '**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,eot}'
+                ]
+            },
+
             workbox: {
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
                 clientsClaim: true,
                 navigateFallbackDenylist: [/^\/api/],
             },
-            // ----------------------------------------------------
+
             manifest: {
                 name: 'Bears Trades Pro',
                 short_name: 'BearsTrades',
