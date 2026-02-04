@@ -1,5 +1,4 @@
-// usePushNotifications.ts - VERSIÓN CORREGIDA
-import { pushService } from '../services/push.service';
+import { pushService } from '../../services/push.service';
 
 /**
  * Convierte base64URL a Uint8Array de forma ROBUSTA
@@ -168,7 +167,7 @@ export const subscribeToPush = async (userId: string) => {
             try {
                 subscription = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
-                    applicationServerKey: applicationServerKey
+                    applicationServerKey: applicationServerKey as any
                 });
 
                 addDebug('SUBSCRIPTION_CREATED', {
