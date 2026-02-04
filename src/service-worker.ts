@@ -1,11 +1,7 @@
 /// <reference lib="webworker" />
-declare const self: ServiceWorkerGlobalScope;
+// src/service-worker.ts
 
-// Definición manual para el evento de cambio de suscripción que falta en las libs por defecto
-interface PushSubscriptionChangeEvent extends ExtendableEvent {
-    readonly newSubscription?: PushSubscription | null;
-    readonly oldSubscription?: PushSubscription | null;
-}
+declare const self: ServiceWorkerGlobalScope;
 
 console.log('[SW] Service Worker cargado');
 
@@ -68,7 +64,7 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
         self.clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((clientList) => {
                 for (let i = 0; i < clientList.length; i++) {
-                    const client = clientList[i] as WindowClient;
+                    const client = clientList[i];
                     if (client.url === urlToOpen && 'focus' in client) {
                         return client.focus();
                     }
@@ -87,7 +83,7 @@ self.addEventListener('notificationclose', (_event: NotificationEvent) => {
 
 // 6. Event: message
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
-    if (event.data && event.data.type === 'PING' && event.ports && event.ports[0]) {
+    if (event.data && event.data.type === 'PING') {
         event.ports[0].postMessage({ type: 'PONG' });
     }
 });
