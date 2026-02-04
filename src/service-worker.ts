@@ -1,6 +1,7 @@
-// /Users/leonardomontes/IdeaProjects/bearstradespro/src/service-worker.ts
-
 /// <reference lib="webworker" />
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
+
 declare const self: ServiceWorkerGlobalScope;
 
 // Definición manual para el evento de cambio de suscripción
@@ -12,26 +13,20 @@ interface PushSubscriptionChangeEvent extends ExtendableEvent {
 // ---------------------------------------------------------------------------
 // PRECACHE INJECTION (Requerido por vite-plugin-pwa en modo injectManifest)
 // ---------------------------------------------------------------------------
-// @ts-ignore: __WB_MANIFEST es inyectado por el plugin durante el build
-const manifest = self.__WB_MANIFEST;
-console.log('[SW] Service Worker cargado con lógica personalizada. Assets:', manifest);
-// Si usaras workbox-precaching, aquí harías: precacheAndRoute(self.__WB_MANIFEST);
+self.skipWaiting();
+clientsClaim();
+
+// 1. Limpiar cachés viejas automáticamente
+cleanupOutdatedCaches();
+
+// 2. Precargar los assets generados por Vite (index.html, js, css, images)
+precacheAndRoute(self.__WB_MANIFEST);
 
 // ---------------------------------------------------------------------------
 // LÓGICA DE NOTIFICACIONES
 // ---------------------------------------------------------------------------
 
-// 1. Event: install
-self.addEventListener('install', (event) => {
-    event.waitUntil(self.skipWaiting());
-});
-
-// 2. Event: activate
-self.addEventListener('activate', (event) => {
-    event.waitUntil(self.clients.claim());
-});
-
-// 3. Event: push (CRÍTICO para push notifications)
+// 1. Event: push (CRÍTICO para push notifications)
 self.addEventListener('push', (event) => {
     if (!event.data) return;
 
@@ -61,7 +56,7 @@ self.addEventListener('push', (event) => {
     );
 });
 
-// 4. Event: notificationclick
+// 2. Event: notificationclick
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
@@ -86,12 +81,12 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-// 5. Event: notificationclose
+// 3. Event: notificationclose
 self.addEventListener('notificationclose', (_event) => {
     console.log('[SW] Notificación cerrada');
 });
 
-// 6. Event: message
+// 4. Event: message
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'PING') {
         if (event.ports && event.ports[0]) {
@@ -100,8 +95,7 @@ self.addEventListener('message', (event) => {
     }
 });
 
-// 7. Event: pushsubscriptionchange
+// 5. Event: pushsubscriptionchange
 self.addEventListener('pushsubscriptionchange', (_event: PushSubscriptionChangeEvent) => {
     console.log('[SW] Push subscription cambió');
-    // Aquí podrías reenviar la nueva suscripción al backend
 });

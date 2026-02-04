@@ -90,20 +90,12 @@ export const subscribeToPush = async (userId: string) => {
             throw new Error('Permisos de notificación denegados por el usuario');
         }
 
-        // 3. Registrar Service Worker
-        addDebug('REGISTER_SW');
-        const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/'
-        });
+        // 3. Obtener el Service Worker que Vite ya registró automáticamente
+        addDebug('GET_SW_REGISTRATION');
+        // .ready espera a que el SW esté activo, no necesitamos registrarlo manualmente
+        const registration = await navigator.serviceWorker.ready;
 
-        addDebug('SW_REGISTERED', {
-            scope: registration.scope,
-            active: !!registration.active
-        });
-
-        // 4. Esperar a que esté activo
-        addDebug('WAIT_FOR_SW');
-        await navigator.serviceWorker.ready;
+        addDebug('SW_READY', { scope: registration.scope });
 
         // 5. Obtener VAPID key del backend
         addDebug('GET_VAPID_KEY');
