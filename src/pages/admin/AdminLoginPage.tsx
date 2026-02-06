@@ -31,7 +31,7 @@ export const AdminLoginPage = () => {
                 .from('user_roles')
                 .select('roles!inner(name)')
                 .eq('user_id', authData.user.id)
-                .eq('roles.name', 'Super Admin')
+                .eq('roles.name', ['Super Admin', 'Admin'])
                 .maybeSingle();
 
             if (roleError) {
@@ -41,7 +41,7 @@ export const AdminLoginPage = () => {
 
             if (!roleData) {
                 await supabase.auth.signOut();
-                throw new Error("ACCESO DENEGADO: No tienes permisos de Super Administrador.");
+                throw new Error("ACCESO DENEGADO: No tienes permisos administrativos.");
             }
 
             toast.success("Bienvenido");

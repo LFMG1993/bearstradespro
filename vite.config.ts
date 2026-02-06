@@ -13,16 +13,16 @@ export default defineConfig({
 
             devOptions: {
                 enabled: true,
-                type: 'module', // Permite que el SW use imports en dev
+                type: 'module',
             },
 
             strategies: 'injectManifest',
             srcDir: 'src',
             filename: 'service-worker.ts',
 
-            // Opciones para la inyección del manifiesto
             injectManifest: {
-                maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+                maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
             },
 
             manifest: {

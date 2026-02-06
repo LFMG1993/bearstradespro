@@ -15,7 +15,7 @@ export interface Signal {
     lotage: number;
 
     // Estado del Trade
-    status: 'ACTIVE' | 'WON' | 'LOST';
+    status: 'ACTIVE' | 'WON' | 'LOST' | 'SECURED' | 'CANCELLED';
     close_price?: number;
     organization_id: string;
 }

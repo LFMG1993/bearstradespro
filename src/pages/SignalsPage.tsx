@@ -3,7 +3,8 @@ import {type ColumnDef} from '@tanstack/react-table';
 import {usePaginatedSignals} from '../hooks/useSignals';
 import {DataTable} from '../components/general/DataTable';
 import type {Signal} from '../types';
-import {Clock, ChevronLeft, ChevronRight, Layers} from 'lucide-react';
+import {Clock, ChevronLeft, ChevronRight, Layers, Filter, X} from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 // 1. Definimos las columnas
 const columns: ColumnDef<Signal>[] = [
@@ -116,15 +117,17 @@ const columns: ColumnDef<Signal>[] = [
     },
 ];
 
-// 2. El Componente de Página
 export const SignalsPage = () => {
+    // Leemos los parámetros de la URL (ej: ?symbol=XAUUSD)
+    const [searchParams, setSearchParams] = useSearchParams();
+    const symbolFilter = searchParams.get('symbol') || undefined;
 
     // Estado para paginación
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
 
-    // Usamos el hook paginado. Cada vez que cambie 'currentPage', hace un fetch nuevo eficiente.
-    const {signals, totalCount, isLoading} = usePaginatedSignals(currentPage, pageSize);
+    // Pasamos el filtro al hook. Si cambia el filtro, la paginación se reinicia o se ajusta.
+    const {signals, totalCount, isLoading} = usePaginatedSignals(currentPage, pageSize, symbolFilter);
     const totalPages = Math.ceil(totalCount / pageSize);
 
     if (isLoading) return <div className="text-white text-center p-10">Cargando historial...</div>;
@@ -133,11 +136,30 @@ export const SignalsPage = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Historial de Señales</h2>
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        Historial de Señales
+                        {symbolFilter && (
+                            <span className="text-sm font-normal bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-lg border border-blue-500/30">
+                                 Filtrado por: {symbolFilter}
+                             </span>
+                        )}
+                    </h2>
                     <p className="text-gray-400 text-sm">Todas las operaciones del bot en tiempo real</p>
                 </div>
-                <div className="bg-gray-800 px-3 py-1 rounded-full text-xs text-gray-400 border border-gray-700">
-                    Total: <span className="text-white font-bold">{totalCount}</span>
+                <div className="flex items-center gap-3">
+                    {symbolFilter && (
+                        <button
+                            onClick={() => setSearchParams({})}
+                            className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 transition bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20"
+                        >
+                            <X size={14} /> Limpiar Filtro
+                        </button>
+                    )}
+
+                    <div className="bg-gray-800 px-3 py-1 rounded-full text-xs text-gray-400 border border-gray-700 flex items-center gap-2">
+                        <Filter size={12} />
+                        Total: <span className="text-white font-bold">{totalCount}</span>
+                    </div>
                 </div>
             </div>
 

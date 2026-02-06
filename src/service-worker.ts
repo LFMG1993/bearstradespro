@@ -13,7 +13,6 @@ interface PushSubscriptionChangeEvent extends ExtendableEvent {
 // ---------------------------------------------------------------------------
 // PRECACHE INJECTION (Requerido por vite-plugin-pwa en modo injectManifest)
 // ---------------------------------------------------------------------------
-self.skipWaiting();
 clientsClaim();
 
 // 1. Limpiar cachés viejas automáticamente
@@ -28,7 +27,6 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 // 1. Event: push (CRÍTICO para push notifications)
 self.addEventListener('push', (event) => {
-    console.log('[SW] 📩 Evento Push Recibido en el navegador!');
     if (!event.data) return;
 
     let notificationData: any = {};
@@ -38,8 +36,6 @@ self.addEventListener('push', (event) => {
     } catch (e) {
         notificationData = { body: event.data.text() };
     }
-
-    console.log('[SW] 📦 Datos procesados:', notificationData);
 
     const title = notificationData.title || 'Nueva Notificación';
     const options: NotificationOptions = {
@@ -86,11 +82,13 @@ self.addEventListener('notificationclick', (event) => {
 
 // 3. Event: notificationclose
 self.addEventListener('notificationclose', (_event) => {
-    console.log('[SW] Notificación cerrada');
 });
 
 // 4. Event: message
 self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
     if (event.data && event.data.type === 'PING') {
         if (event.ports && event.ports[0]) {
             event.ports[0].postMessage({ type: 'PONG' });
@@ -100,5 +98,4 @@ self.addEventListener('message', (event) => {
 
 // 5. Event: pushsubscriptionchange
 self.addEventListener('pushsubscriptionchange', (_event: PushSubscriptionChangeEvent) => {
-    console.log('[SW] Push subscription cambió');
 });

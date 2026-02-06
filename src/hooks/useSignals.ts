@@ -1,31 +1,39 @@
-import { useEffect } from 'react';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
-import { fetchSignals, fetchSignalsPaginated } from '../services/signals.service';
-import type { Signal } from '../types';
+import {useEffect} from 'react';
+import {useQuery, useQueryClient, keepPreviousData} from '@tanstack/react-query';
+import {supabase} from '../lib/supabase';
+import {fetchSignals, fetchSignalsPaginated} from '../services/signals.service';
+import {useAuthStore} from '../stores/useAuthStore';
+import type {Signal} from '../types';
 
 export const useSignals = () => {
     const queryClient = useQueryClient();
-    const QUERY_KEY = ['signals'];
+    const {profile} = useAuthStore();
+    const organizationId = profile?.organization_id;
 
-    // 1. GESTIÓN DE ESTADO CON TANSTACK QUERY
-    // Esto maneja loading, error, cache y reintentos automáticamente.
-    const { data: signals = [], isLoading, error } = useQuery({
+    const QUERY_KEY = ['signals', organizationId];
+
+    const {data: signals = [], isLoading, error} = useQuery({
         queryKey: QUERY_KEY,
-        queryFn: fetchSignals,
-        staleTime: 1000 * 60 * 5, // Consideramos la data "fresca" por 5 min (el realtime se encarga de lo nuevo)
+        queryFn: () => fetchSignals(organizationId),
+        staleTime: 1000 * 60 * .30,
+        refetchOnWindowFocus: true,
+        enabled: !!organizationId,
     });
 
-    // 2. SUSCRIPCIÓN REALTIME (Inyecta datos directo a la caché)
+    // SUSCRIPCIÓN REALTIME
     useEffect(() => {
+        if (!organizationId) return;
         const channel = supabase
-            .channel('public:signals')
+            .channel(`signals-org-${organizationId}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'signals' },
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'signals',
+                    filter: `organization_id=eq.${organizationId}`
+                },
                 (payload) => {
-                    // ACTUALIZACIÓN OPTIMISTA:
-                    // En vez de recargar todo (invalidateQueries), inyectamos la nueva señal manualmente.
                     queryClient.setQueryData<Signal[]>(QUERY_KEY, (oldData) => {
                         const newSignal = payload.new as Signal;
                         return oldData ? [newSignal, ...oldData] : [newSignal];
@@ -34,10 +42,13 @@ export const useSignals = () => {
             )
             .on(
                 'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'signals' },
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'signals',
+                    filter: `organization_id=eq.${organizationId}`
+                },
                 (payload) => {
-                    // ACTUALIZACIÓN DE ESTADO (WON/LOST):
-                    // Buscamos la señal en la caché y la actualizamos quirúrgicamente.
                     queryClient.setQueryData<Signal[]>(QUERY_KEY, (oldData) => {
                         if (!oldData) return [];
                         return oldData.map((signal) =>
@@ -51,19 +62,18 @@ export const useSignals = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [queryClient]); // Dependencia segura
+    }, [queryClient, organizationId]);
 
-    return { signals, isLoading, error };
+    return {signals, isLoading, error};
 };
 
-// Nuevo Hook para la Tabla con Paginación de Servidor
-export const usePaginatedSignals = (page: number, pageSize: number) => {
-    const QUERY_KEY = ['signals', 'paginated', page, pageSize];
+export const usePaginatedSignals = (page: number, pageSize: number, symbol?: string) => {
+    const QUERY_KEY = ['signals', 'paginated', page, pageSize, symbol];
 
-    const { data, isLoading, error } = useQuery({
+    const {data, isLoading, error} = useQuery({
         queryKey: QUERY_KEY,
-        queryFn: () => fetchSignalsPaginated(page, pageSize),
-        placeholderData: keepPreviousData, // Mantiene la data anterior mientras carga la nueva (evita parpadeos)
+        queryFn: () => fetchSignalsPaginated(page, pageSize, symbol),
+        placeholderData: keepPreviousData,
     });
 
     return {

@@ -2,11 +2,14 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {useAuthStore} from '../../stores/useAuthStore';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {Lock, LogOut} from 'lucide-react';
+import {Lock, LogOut, CreditCard} from 'lucide-react';
+import {paymentService} from '../../services/payment.service';
 
 export const AuthGuard = ({children}: { children: React.ReactNode }) => {
     const {user, profile, isLoading, initialized, signOut} = useAuthStore();
     const [timeExpired, setTimeExpired] = useState(false);
+    const [paymentLoading, setPaymentLoading] = useState(false);
+    const [paymentError, setPaymentError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -42,8 +45,24 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
     // Si está cargando la sesión inicial, mostramos spinner o nada
     if (isLoading || !initialized) return null;
 
+    const handleSubscribe = async () => {
+        if (!profile?.organization_id) {
+            setPaymentError("No se encontró la organización.");
+            return;
+        }
+        setPaymentLoading(true);
+        setPaymentError(null);
+        try {
+            const data = await paymentService.createPreference('pro', profile.organization_id);
+            const url = data.sandbox_init_point || data.init_point;
+            window.location.href = url;
+        } catch (err: any) {
+            setPaymentError(err.message || "Error al iniciar el pago.");
+            setPaymentLoading(false);
+        }
+    };
+
     // 1. BLOQUEO POR SUSCRIPCIÓN VENCIDA
-    // Verificamos si el usuario está logueado, tiene fecha de vencimiento y NO está intentando entrar al admin
     if (user && profile?.trial_ends_at && !location.pathname.startsWith('/admin')) {
         const trialEnd = new Date(profile.trial_ends_at);
         const now = new Date();
@@ -60,14 +79,31 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
                         <h2 className="text-2xl font-bold text-white mb-2">Suscripción Vencida</h2>
                         <p className="text-gray-400 mb-8">
                             Tu periodo de prueba finalizó el {trialEnd.toLocaleDateString()}.<br/>
-                            Por favor contacta a soporte para renovar tu acceso a las señales.
+                            Suscríbete ahora para reactivar tu acceso inmediato.
                         </p>
-                        <button
-                            onClick={() => signOut()}
-                            className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition flex items-center justify-center gap-2"
-                        >
-                            <LogOut size={18}/> Cerrar Sesión
-                        </button>
+                        {paymentError && (
+                            <div
+                                className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-sm">
+                                {paymentError}
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleSubscribe}
+                                disabled={paymentLoading}
+                                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <CreditCard size={18}/>
+                                {paymentLoading ? 'Procesando...' : 'Suscribirse con MercadoPago'}
+                            </button>
+                            <button
+                                onClick={() => signOut()}
+                                className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition flex items-center justify-center gap-2"
+                            >
+                                <LogOut size={18}/> Cerrar Sesión
+                            </button>
+                        </div>
                     </div>
                 </div>
             );

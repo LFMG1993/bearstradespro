@@ -1,8 +1,8 @@
-import { supabase } from '../lib/supabase';
-import type { Signal } from '../types';
+import {supabase} from '../lib/supabase';
+import type {Signal} from '../types';
 
 export const createSignal = async (signal: Partial<Signal>) => {
-    const { data, error } = await supabase
+    const {data, error} = await supabase
         .from('signals')
         .insert(signal)
         .select()
@@ -10,20 +10,26 @@ export const createSignal = async (signal: Partial<Signal>) => {
 
     if (error) {
         // Si RLS bloquea la inserción, Supabase devuelve un error específico
-        if (error.code === '42501') { // Código Postgres para permisos insuficientes
-            throw new Error('No tienes permisos para realizar esta acción (Bloqueado por seguridad).');
+        if (error.code === '42501') {
+            throw new Error('No tienes permisos para realizar esta acción.');
         }
         throw new Error(error.message);
     }
     return data;
 };
 
-export const fetchSignals = async (): Promise<Signal[]> => {
-    const { data, error } = await supabase
+export const fetchSignals = async (organizationId?: string): Promise<Signal[]> => {
+    let query = supabase
         .from('signals')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', {ascending: false})
         .limit(1000);
+
+    if (organizationId) {
+        query = query.eq('organization_id', organizationId);
+    }
+
+    const {data, error} = await query;
 
     if (error) throw new Error(error.message);
     return data as Signal[];
@@ -39,28 +45,39 @@ export const fetchSignalsByMonth = async (date: Date): Promise<Signal[]> => {
     // Último día del mes seleccionado (truco: día 0 del mes siguiente)
     const endDate = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
 
-    const { data, error } = await supabase
+    const {data, error} = await supabase
         .from('signals')
         .select('*')
         .gte('created_at', startDate) // gte = Greater Than or Equal
         .lte('created_at', endDate)   // lte = Less Than or Equal
-        .order('created_at', { ascending: false });
+        .order('created_at', {ascending: false});
 
     if (error) throw new Error(error.message);
     return data as Signal[];
 };
 
 // Nueva función para paginación eficiente en el servidor
-export const fetchSignalsPaginated = async (page: number, pageSize: number): Promise<{ data: Signal[], count: number }> => {
+export const fetchSignalsPaginated = async (page: number, pageSize: number, symbol?: string): Promise<{
+    data: Signal[],
+    count: number
+}> => {
     const from = page * pageSize;
     const to = from + pageSize - 1;
 
-    const { data, error, count } = await supabase
+    let query = supabase
         .from('signals')
-        .select('*', { count: 'exact' }) // Solicitamos el conteo total real
-        .order('created_at', { ascending: false })
-        .range(from, to); // Supabase solo devuelve este rango
+        .select('*', {count: 'exact'});
+
+    // 2. Aplicamos el filtro solo si existe el símbolo
+    if (symbol) {
+        query = query.eq('symbol', symbol);
+    }
+
+    // 3. Ordenamos y paginamos
+    const {data, error, count} = await query
+        .order('created_at', {ascending: false})
+        .range(from, to);
 
     if (error) throw new Error(error.message);
-    return { data: data as Signal[], count: count || 0 };
+    return {data: data as Signal[], count: count || 0};
 };
