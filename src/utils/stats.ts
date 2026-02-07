@@ -17,7 +17,7 @@ export const calculateMonthlyStats = (signals: Signal[]) => {
 
     recentSignals.forEach(signal => {
         // Solo contamos operaciones cerradas
-        if (signal.status === 'WON') {
+        if (signal.status === 'WON' || signal.status === 'SECURED') {
             wins++;
             // Sumamos la ganancia REAL
             totalProfit += (signal.realized_profit || 0);
@@ -48,7 +48,7 @@ export const calculateSymbolStats = (signals: Signal[], date: Date = new Date())
         const signalDate = new Date(s.created_at);
         return signalDate.getMonth() === targetMonth &&
             signalDate.getFullYear() === targetYear &&
-            (s.status === 'WON' || s.status === 'LOST');
+            (s.status === 'WON' || s.status === 'LOST' || s.status === 'SECURED');
     });
 
     // 2. Agrupar por símbolo
@@ -62,7 +62,7 @@ export const calculateSymbolStats = (signals: Signal[], date: Date = new Date())
     const stats: SymbolStat[] = Object.keys(groups).map(symbol => {
         const group = groups[symbol];
         const totalTrades = group.length;
-        const wins = group.filter(s => s.status === 'WON').length;
+        const wins = group.filter(s => s.status === 'WON' || s.status === 'SECURED').length;
         const losses = group.filter(s => s.status === 'LOST').length;
 
         // Calcular profit neto del símbolo
