@@ -31,7 +31,7 @@ export const AdminLoginPage = () => {
                 .from('user_roles')
                 .select('roles!inner(name)')
                 .eq('user_id', authData.user.id)
-                .eq('roles.name', ['Super Admin', 'Admin'])
+                .in('roles.name', ['Super Admin', 'Admin'])
                 .maybeSingle();
 
             if (roleError) {
