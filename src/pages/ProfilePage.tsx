@@ -66,9 +66,17 @@ export const ProfilePage = () => {
         }
     };
 
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
     const handleLogout = async () => {
-        await signOut();
-        // El listener onAuthStateChange se encargará de redirigir o limpiar el estado.
+        setIsLoggingOut(true);
+        try {
+            await signOut();
+            window.location.href = '/login';
+        } catch (error) {
+            console.error(error);
+            setIsLoggingOut(false);
+        }
     };
 
     if (!profile) {
@@ -202,11 +210,16 @@ export const ProfilePage = () => {
             {/* Logout Button */}
             <div className="pt-4 border-t border-gray-800">
                 <button
+                    disabled={isLoggingOut}
                     onClick={handleLogout}
-                    className="w-full bg-gray-800 hover:bg-rose-500/20 text-rose-400 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 border border-gray-700 hover:border-rose-500/30"
+                    className="w-full bg-gray-800 hover:bg-rose-500/20 text-rose-400 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 border border-gray-700 hover:border-rose-500/30 disabled:opacity-50"
                 >
-                    <LogOut size={18}/>
-                    Cerrar Sesión
+                    {isLoggingOut ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400"></div>
+                    ) : (
+                        <LogOut size={18}/>
+                    )}
+                    {isLoggingOut ? 'Cerrando sesión...' : 'Cerrar Sesión'}
                 </button>
             </div>
         </div>

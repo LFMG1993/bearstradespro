@@ -8,6 +8,7 @@ import {AuthGuard} from './components/auth/AuthGuard';
 import {SuperAdminGuard} from "./components/auth/SuperAdminGuard.tsx";
 import {Analytics} from "./components/general/Analytics.tsx";
 import {MainLayout} from "./components/general/MainLayout.tsx";
+import LandingPage from "./pages/landing/LandingPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import {SignalsPage} from "./pages/SignalsPage.tsx";
 import {PerformancePage} from "./pages/PerformancePage.tsx";
@@ -25,6 +26,8 @@ import {AdminLoginPage} from "./pages/admin/AdminLoginPage.tsx";
 import {AdminUsersPage} from "./pages/admin/AdminUsersPage.tsx";
 import {AdminPlansPage} from "./pages/admin/AdminPlansPage.tsx";
 import {AdminSubscriptionsPage} from "./pages/admin/AdminSubscriptionsPage.tsx";
+import {AdminOrganizationsPage} from "./pages/admin/AdminOrganizationsPage.tsx";
+import {AdminSignalsPage} from "./pages/admin/AdminSignalsPage.tsx";
 
 const PlaceholderPage = ({title}: { title: string }) => (
     <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
@@ -46,11 +49,12 @@ const queryClient = new QueryClient({
 function App() {
     const initializeAuth = useAuthStore(state => state.initializeAuth);
 
-    const [isAdminDomain] = useState(() => {
+    const [domainType] = useState(() => {
         const hostname = window.location.hostname;
-        if (hostname.startsWith('admin')) return true;
-        if (import.meta.env.DEV && window.location.pathname.startsWith('/admin')) return true;
-        return false;
+        if (hostname.startsWith('admin')) return 'admin';
+        if (hostname.startsWith('app')) return 'app';
+        // if (import.meta.env.DEV && hostname.startsWith('localhost')) return 'app';
+        return 'landing';
     });
 
     useEffect(() => {
@@ -59,33 +63,34 @@ function App() {
 
 
     // 1. APLICACIÓN ADMINISTRATIVA
-    if (isAdminDomain) {
+    if (domainType === 'admin') {
         return (
             <QueryClientProvider client={queryClient}>
                 <NotificationsProvider>
                     <BrowserRouter>
                         <Routes>
                             {/* Redirección raíz: Si entra al dominio admin, va al dashboard */}
-                            <Route path="/" element={<Navigate to="/admin" replace />} />
+                            <Route path="/" element={<Navigate to="/admin" replace/>}/>
                             {/* Login Administrativo */}
                             <Route path="/admin/login" element={<AdminLoginPage/>}/>
-                            <Route path="/login" element={<Navigate to="/admin/login" replace />} />
+                            <Route path="/login" element={<Navigate to="/admin/login" replace/>}/>
                             {/* Rutas Protegidas del Admin */}
                             <Route path="/admin" element={<SuperAdminGuard><AdminLayout/></SuperAdminGuard>}>
                                 <Route index element={<AdminDashboard/>}/>
                                 <Route path="users" element={<AdminUsersPage/>}/>
                                 <Route path="plans" element={<AdminPlansPage/>}/>
                                 <Route path="subscriptions" element={<AdminSubscriptionsPage/>}/>
-                                <Route path="orgs" element={<PlaceholderPage title="Gestión de Organizaciones"/>}/>
+                                <Route path="orgs" element={<AdminOrganizationsPage/>}/>
+                                <Route path="signals" element={<AdminSignalsPage/>}/>
                             </Route>
                             {/* Cualquier ruta desconocida en este dominio va al login admin */}
-                            <Route path="*" element={<Navigate to="/admin/login" replace />} />
+                            <Route path="*" element={<Navigate to="/admin/login" replace/>}/>
                         </Routes>
                         <Toaster
                             position="top-right"
                             reverseOrder={false}
                             toastOptions={{
-                                style: { background: '#333', color: '#fff' },
+                                style: {background: '#333', color: '#fff'},
                             }}
                         />
                     </BrowserRouter>
@@ -95,51 +100,71 @@ function App() {
     }
 
     // APLICACIÓN DE USUARIO
+    if (domainType === 'app') {
+        return (
+            <QueryClientProvider client={queryClient}>
+                <NotificationsProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            {/* Si alguien intenta entrar a /admin en la app de usuarios, lo mandamos a su dominio correcto */}
+                            <Route path="/admin/*" element={<RedirectToAdmin/>}/>
+                            <Route path="/*" element={
+                                <AuthGuard>
+                                    <Analytics/>
+                                    <Routes>
+                                        {/* Rutas Publícas */}
+                                        <Route path="/login" element={<LoginPage/>}/>
+                                        <Route path="/register" element={<RegisterPage/>}/>
+                                        <Route path="/privacy" element={<PrivacyPage/>}/>
+                                        <Route path="/risk-disclaimer" element={<RiskDisclaimerPage/>}/>
+                                        {/* Rutas de Retorno de Pagos */}
+                                        <Route path="/payment/success" element={<PaymentResultPage status="success"/>}/>
+                                        <Route path="/payment/failure" element={<PaymentResultPage status="failure"/>}/>
+                                        <Route path="/payment/pending" element={<PaymentResultPage status="pending"/>}/>
+                                        {/* Zona de Usuario */}
+                                        <Route path="/" element={<MainLayout/>}>
+                                            <Route index element={<HomePage/>}/>
+                                            <Route path="signals" element={<SignalsPage/>}/>
+                                            <Route path="trade" element={<TradingPlanPage/>}/>
+                                            <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
+                                            <Route path="profile" element={<ProfilePage/>}/>
+                                            <Route path="performance" element={<PerformancePage/>}/>
+                                        </Route>
+                                    </Routes>
+                                    <Toaster
+                                        position="top-right"
+                                        reverseOrder={false}
+                                        toastOptions={{
+                                            style: {
+                                                background: '#333',
+                                                color: '#fff',
+                                            },
+                                        }}
+                                    />
+                                </AuthGuard>
+                            }/>
+                        </Routes>
+                    </BrowserRouter>
+                </NotificationsProvider>
+            </QueryClientProvider>
+        );
+    }
+
+    // LANDING PAGE
     return (
         <QueryClientProvider client={queryClient}>
-            <NotificationsProvider>
-                <BrowserRouter>
-                    <Routes>
-                        {/* Si alguien intenta entrar a /admin en la app de usuarios, lo mandamos a su dominio correcto */}
-                        <Route path="/admin/*" element={<RedirectToAdmin />} />
-                        <Route path="/*" element={
-                            <AuthGuard>
-                                <Analytics/>
-                                <Routes>
-                                    {/* Rutas Publícas */}
-                                    <Route path="/login" element={<LoginPage/>}/>
-                                    <Route path="/register" element={<RegisterPage/>}/>
-                                    <Route path="/privacy" element={<PrivacyPage/>}/>
-                                    <Route path="/risk-disclaimer" element={<RiskDisclaimerPage/>}/>
-                                    {/* Rutas de Retorno de Pagos */}
-                                    <Route path="/payment/success" element={<PaymentResultPage status="success"/>}/>
-                                    <Route path="/payment/failure" element={<PaymentResultPage status="failure"/>}/>
-                                    <Route path="/payment/pending" element={<PaymentResultPage status="pending"/>}/>
-                                    {/* Zona de Usuario */}
-                                    <Route path="/" element={<MainLayout/>}>
-                                        <Route index element={<HomePage/>}/>
-                                        <Route path="signals" element={<SignalsPage/>}/>
-                                        <Route path="trade" element={<TradingPlanPage/>}/>
-                                        <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
-                                        <Route path="profile" element={<ProfilePage/>}/>
-                                        <Route path="performance" element={<PerformancePage/>}/>
-                                    </Route>
-                                </Routes>
-                                <Toaster
-                                    position="top-right"
-                                    reverseOrder={false}
-                                    toastOptions={{
-                                        style: {
-                                            background: '#333',
-                                            color: '#fff',
-                                        },
-                                    }}
-                                />
-                            </AuthGuard>
-                        }/>
-                    </Routes>
-                </BrowserRouter>
-            </NotificationsProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="*" element={<LandingPage/>}/>
+                </Routes>
+                <Toaster
+                    position="top-right"
+                    reverseOrder={false}
+                    toastOptions={{
+                        style: {background: '#333', color: '#fff'},
+                    }}
+                />
+            </BrowserRouter>
         </QueryClientProvider>
     );
 }
@@ -153,7 +178,8 @@ const RedirectToAdmin = () => {
             window.location.href = 'https://admin.bearstrade.org';
         }
     }, []);
-    return <div className="h-screen bg-gray-900 flex items-center justify-center text-white">Redirigiendo al panel administrativo...</div>;
+    return <div className="h-screen bg-gray-900 flex items-center justify-center text-white">Redirigiendo al panel
+        administrativo...</div>;
 };
 
 export default App

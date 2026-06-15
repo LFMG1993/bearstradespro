@@ -15,37 +15,26 @@ export const authService = {
 
     register: async ({email, password, fullName, phone, organizationId}: LoginCredentials & { fullName: string; phone: string; organizationId?: string }) => {
         const targetOrgId = organizationId || DEFAULT_ORG_ID;
-        const {data, error} = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    phone: phone,
-                    organizationId: targetOrgId,
-                },
-            },
+        
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+                password,
+                fullName,
+                phone,
+                organizationId: targetOrgId,
+                redirectTo: `${window.location.origin}/login`
+            })
         });
 
-        if (error) throw error;
-        if (!data.user) throw new Error("No se pudo crear el usuario");
-
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/onboarding/init-trial`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({userId: data.user.id})
-            });
-
-            if (!response.ok) {
-                const resJson = await response.json();
-                console.error("⚠️ Error en onboarding:", resJson);
-                throw new Error(resJson.error || "Error configurando la cuenta");
-            }
-        } catch (e) {
-            console.error("Error conectando con onboarding:", e);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.error || "Error al registrar el usuario");
         }
-        return data;
+
+        return await response.json();
     },
 
     // Login Social con Google

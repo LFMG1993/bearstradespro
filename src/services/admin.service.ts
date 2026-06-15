@@ -1,8 +1,8 @@
-import {supabase} from '../lib/supabase';
-import type {AdminUser, Plan, Subscription} from '../types';
+import { supabase } from '../lib/supabase';
+import type { AdminUser, Plan, Subscription } from '../types';
 
 const getAuthHeader = async () => {
-    const {data: {session}} = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("Sesión expirada");
     return {
         'Authorization': `Bearer ${session.access_token}`,
@@ -16,7 +16,7 @@ export const adminService = {
      */
     async getUsers(): Promise<AdminUser[]> {
         const headers = await getAuthHeader();
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {headers});
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, { headers });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Error al obtener usuarios");
         return json.data;
@@ -27,10 +27,38 @@ export const adminService = {
      */
     async getOrganizations(): Promise<any[]> {
         const headers = await getAuthHeader();
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orgs-list`, {headers});
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/organizations`, { headers });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Error al obtener organizaciones");
         return json.data;
+    },
+
+    /**
+     * Crea una nueva organización
+     */
+    async createOrganization(orgData: any): Promise<void> {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/organizations`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(orgData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al crear la organización");
+    },
+
+    /**
+     * Actualiza una organización existente
+     */
+    async updateOrganization(id: string, orgData: any): Promise<void> {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/organizations/${id}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(orgData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al actualizar la organización");
     },
 
     /**
@@ -51,16 +79,13 @@ export const adminService = {
      */
     async getPlans(): Promise<Plan[]> {
         const headers = await getAuthHeader();
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans`, {headers});
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans`, { headers });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Error al obtener planes");
         return json.data.map((plan: any) => ({
             ...plan,
-            // Convertir precio de string "29.00" a número 29.00
             price: typeof plan.price === 'string' ? parseFloat(plan.price) : plan.price,
-            // Parsear features si viene como string JSON, si ya es objeto lo dejamos igual
             features: typeof plan.features === 'string' ? JSON.parse(plan.features) : (plan.features || {}),
-            // Normalizar nombres de propiedades (snake_case -> camelCase)
             organizationId: plan.organization_id || plan.organizationId,
             organizationName: plan.organization_name || plan.organization?.name || plan.organizationName
         }));
@@ -78,11 +103,10 @@ export const adminService = {
 
         const payload = {
             ...planData,
-            // El backend espera organization_id
             organization_id: planData.organizationId
         };
 
-        const res = await fetch(url, {method, headers, body: JSON.stringify(payload)});
+        const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Error al guardar el plan");
     },
@@ -92,7 +116,7 @@ export const adminService = {
      */
     async getSubscriptions(): Promise<Subscription[]> {
         const headers = await getAuthHeader();
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/subscriptions`, {headers});
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/subscriptions`, { headers });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Error al obtener suscripciones");
         return json.data.map((sub: any) => ({
@@ -128,5 +152,89 @@ export const adminService = {
             const json = await res.json();
             throw new Error(json.error || "Error al eliminar usuario");
         }
+    },
+
+    /**
+     * Sube una imagen a Cloudflare R2
+     */
+    async uploadImage(file: File, folder: string): Promise<string> {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("Sesión expirada");
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/upload?folder=${encodeURIComponent(folder)}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            },
+            body: formData
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al subir la imagen");
+        return json.url;
+    },
+
+    /**
+     * Obtiene todas las señales para el módulo de métricas del Super Admin
+     */
+    async getSignals(filters?: { startDate?: string; endDate?: string; orgId?: string; symbol?: string }): Promise<any[]> {
+        const headers = await getAuthHeader();
+        
+        let url = `${import.meta.env.VITE_API_URL}/api/admin/signals`;
+        const params = new URLSearchParams();
+        
+        if (filters?.startDate) params.append('startDate', filters.startDate);
+        if (filters?.endDate) params.append('endDate', filters.endDate);
+        if (filters?.orgId) params.append('orgId', filters.orgId);
+        if (filters?.symbol) params.append('symbol', filters.symbol);
+        
+        const queryString = params.toString();
+        if (queryString) {
+            url += `?${queryString}`;
+        }
+        
+        const res = await fetch(url, { headers });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al obtener las señales");
+        return json.data;
+    },
+
+    /**
+     * Obtiene la lista de símbolos únicos de señales
+     */
+    async getSymbols(): Promise<string[]> {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/signals/symbols`, { headers });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al obtener los símbolos");
+        return json.data;
+    },
+
+    /**
+     * Obtiene el Kardex (Historial de suscripciones y pagos) de un usuario
+     */
+    async getUserKardex(userId: string): Promise<any[]> {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/kardex`, { headers });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al obtener el kardex");
+        return json.data;
+    },
+
+    /**
+     * Activa o inactiva un usuario
+     */
+    async toggleUserStatus(userId: string, isActive: boolean): Promise<void> {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/status`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({ isActive })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Error al cambiar el estado del usuario");
     }
 };

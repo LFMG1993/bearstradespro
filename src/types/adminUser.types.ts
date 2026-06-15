@@ -10,5 +10,6 @@ export interface AdminUser {
     expiresAt: string | null;
     phone?: string;
     avatar?: string;
+    isActive?: boolean;
     joinedAt: string;
 }

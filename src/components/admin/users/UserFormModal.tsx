@@ -1,7 +1,8 @@
-import {useState, useEffect} from 'react';
-import {X, Save, Loader2, Building2} from 'lucide-react';
-import {adminService} from '../../../services/admin.service.ts';
+import { useState, useEffect, useMemo } from 'react';
+import { X, Save, Loader2, Building2, Infinity } from 'lucide-react';
+import { adminService } from '../../../services/admin.service.ts';
 import toast from 'react-hot-toast';
+import type { Plan } from '../../../types';
 
 interface UserFormModalProps {
     isOpen: boolean;
@@ -10,9 +11,11 @@ interface UserFormModalProps {
     userToEdit?: any;
 }
 
-export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserFormModalProps) => {
+export const UserFormModal = ({ isOpen, onClose, onSuccess, userToEdit }: UserFormModalProps) => {
     const [loading, setLoading] = useState(false);
     const [orgs, setOrgs] = useState<any[]>([]);
+    const [allPlans, setAllPlans] = useState<Plan[]>([]);
+    const [isIndefinite, setIsIndefinite] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -26,12 +29,13 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
         discountPercent: 0
     });
 
-    // Cargar organizaciones al abrir
+    // Cargar organizaciones y planes al abrir
     useEffect(() => {
         if (isOpen) {
-            fetchOrgs();
+            fetchData();
             if (userToEdit) {
                 // Modo EDICIÓN: Llenar datos
+                setIsIndefinite(userToEdit.days >= 9999);
                 setFormData({
                     id: userToEdit.id,
                     email: userToEdit.email || '',
@@ -39,18 +43,19 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                     fullName: userToEdit.fullName || '',
                     organizationId: userToEdit.organizationId || '',
                     planCode: userToEdit.planCode || 'pro',
-                    days: 30,
+                    days: userToEdit.days || 30,
                     discountPercent: userToEdit.discountPercent || 0
                 });
             } else {
                 // Modo CREAR: Reset
+                setIsIndefinite(false);
                 setFormData({
                     id: '',
                     email: '',
                     password: '',
                     fullName: '',
                     organizationId: '',
-                    planCode: 'pro',
+                    planCode: '',
                     days: 30,
                     discountPercent: 0
                 });
@@ -58,25 +63,47 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
         }
     }, [isOpen, userToEdit]);
 
-    const fetchOrgs = async () => {
+    const fetchData = async () => {
         try {
-            const data = await adminService.getOrganizations();
-            setOrgs(data);
+            const [orgData, plansData] = await Promise.all([
+                adminService.getOrganizations(),
+                adminService.getPlans()
+            ]);
+            setOrgs(orgData);
+            setAllPlans(plansData);
         } catch (error) {
-            console.error("Error cargando organizaciones", error);
+            console.error("Error cargando datos", error);
         }
     };
+
+    // Filtrar planes dinámicamente según la organización seleccionada
+    const availablePlans = useMemo(() => {
+        if (!formData.organizationId) return [];
+        return allPlans.filter(p => p.organizationId === formData.organizationId);
+    }, [formData.organizationId, allPlans]);
+
+    // Preseleccionar el primer plan cuando cambia la organización si no hay uno válido
+    useEffect(() => {
+        if (availablePlans.length > 0 && !availablePlans.find(p => p.code === formData.planCode)) {
+            setFormData(prev => ({ ...prev, planCode: availablePlans[0].code }));
+        }
+    }, [availablePlans]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            await adminService.saveUser(formData);
+            const payload = {
+                ...formData,
+                days: isIndefinite ? 9999 : formData.days
+            };
+
+            await adminService.saveUser(payload);
 
             toast.success(userToEdit ? "Usuario actualizado" : "Usuario creado correctamente");
-            onSuccess(); // Recargar tabla
-            onClose();   // Cerrar modal
+            onSuccess();
+            onClose();
         } catch (error: any) {
             toast.error(error.message);
         } finally {
@@ -97,7 +124,7 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                         {userToEdit ? 'Editar Usuario' : 'Nuevo Usuario'}
                     </h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-white transition">
-                        <X size={24}/>
+                        <X size={24} />
                     </button>
                 </div>
 
@@ -112,7 +139,7 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                                 required
                                 type="text"
                                 value={formData.fullName}
-                                onChange={e => setFormData({...formData, fullName: e.target.value})}
+                                onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
                             />
                         </div>
@@ -122,7 +149,7 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                                 required
                                 type="email"
                                 value={formData.email}
-                                onChange={e => setFormData({...formData, email: e.target.value})}
+                                onChange={e => setFormData({ ...formData, email: e.target.value })}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
                             />
                         </div>
@@ -132,13 +159,13 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                     <div className="space-y-1">
                         <label className="text-xs font-medium text-slate-400">
                             Contraseña {userToEdit &&
-                            <span className="text-slate-500">(Dejar en blanco para mantener actual)</span>}
+                                <span className="text-slate-500"> (Dejar en blanco para mantener actual)</span>}
                         </label>
                         <input
                             type="password"
                             required={!userToEdit} // Obligatoria solo al crear
                             value={formData.password}
-                            onChange={e => setFormData({...formData, password: e.target.value})}
+                            onChange={e => setFormData({ ...formData, password: e.target.value })}
                             className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
                             placeholder="••••••••"
                         />
@@ -148,12 +175,12 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-medium text-slate-400 flex gap-1 items-center">
-                                <Building2 size={12}/> Organización
+                                <Building2 size={12} /> Organización
                             </label>
                             <select
                                 required
                                 value={formData.organizationId}
-                                onChange={e => setFormData({...formData, organizationId: e.target.value})}
+                                onChange={e => setFormData({ ...formData, organizationId: e.target.value })}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none appearance-none"
                             >
                                 <option value="">Seleccionar...</option>
@@ -165,30 +192,46 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                         <div className="space-y-1">
                             <label className="text-xs font-medium text-slate-400">Plan Inicial</label>
                             <select
+                                required
                                 value={formData.planCode}
-                                onChange={e => setFormData({...formData, planCode: e.target.value})}
+                                onChange={e => setFormData({ ...formData, planCode: e.target.value })}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
+                                disabled={!formData.organizationId}
                             >
-                                <option value="pro">Bearstrades Pro</option>
-                                <option value="enterprise">Enterprise</option>
+                                {availablePlans.length === 0 && <option value="">Selecciona organización...</option>}
+                                {availablePlans.map(plan => (
+                                    <option key={plan.id} value={plan.code}>{plan.name} ({plan.code})</option>
+                                ))}
                             </select>
                         </div>
                     </div>
 
                     {/* Días y Descuento */}
                     <div
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/30 p-3 rounded-lg border border-slate-800">
+                        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/30 p-3 rounded-lg border border-slate-800 relative">
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-slate-400">Días de Acceso</label>
+                            <div className="flex justify-between items-center">
+                                <label className="text-xs font-medium text-slate-400">Días de Acceso</label>
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={isIndefinite}
+                                        onChange={e => setIsIndefinite(e.target.checked)}
+                                        className="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500/20 bg-slate-900"
+                                    />
+                                    <span className="text-[10px] text-slate-400">Indefinido</span>
+                                </label>
+                            </div>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="number"
                                     min="0"
-                                    value={formData.days}
-                                    onChange={e => setFormData({...formData, days: parseInt(e.target.value)})}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
+                                    disabled={isIndefinite}
+                                    value={isIndefinite ? 9999 : formData.days}
+                                    onChange={e => setFormData({ ...formData, days: parseInt(e.target.value) || 0 })}
+                                    className={`w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none ${isIndefinite ? 'opacity-50' : ''}`}
                                 />
-                                <span className="text-xs text-slate-500">días</span>
+                                {isIndefinite ? <Infinity size={16} className="text-emerald-500" /> : <span className="text-xs text-slate-500">días</span>}
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -201,7 +244,7 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                                     value={formData.discountPercent}
                                     onChange={e => setFormData({
                                         ...formData,
-                                        discountPercent: parseFloat(e.target.value)
+                                        discountPercent: parseFloat(e.target.value) || 0
                                     })}
                                     className="w-full bg-slate-950 border border-emerald-500/30 rounded-lg p-2.5 text-white focus:border-emerald-500 outline-none"
                                 />
@@ -224,7 +267,7 @@ export const UserFormModal = ({isOpen, onClose, onSuccess, userToEdit}: UserForm
                             disabled={loading}
                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                         >
-                            {loading ? <Loader2 size={16} className="animate-spin"/> : <Save size={16}/>}
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                             {userToEdit ? 'Guardar Cambios' : 'Crear Usuario'}
                         </button>
                     </div>

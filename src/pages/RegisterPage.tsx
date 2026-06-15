@@ -1,26 +1,29 @@
-import React, {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import {Mail, Lock, User, ArrowRight, AlertCircle, Phone} from 'lucide-react';
-import {authService} from '../services/auth.service';
-import {countries} from '../data/countries';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Mail, Lock, User, ArrowRight, AlertCircle, Phone } from 'lucide-react';
+import { authService } from '../services/auth.service';
+import { countries } from '../data/countries';
 
 export const RegisterPage = () => {
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({fullName: '', email: '', password: '', phone: ''});
+    const [formData, setFormData] = useState({ fullName: '', email: '', password: '', phone: '' });
     const [agreed, setAgreed] = useState(false);
     const [countryCode, setCountryCode] = useState('+57');
+
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setSuccessMsg(null);
         const fullPhoneNumber = `${countryCode}${formData.phone}`;
 
         try {
-            await authService.register({...formData, phone: fullPhoneNumber});
-            navigate('/');
+            await authService.register({ ...formData, phone: fullPhoneNumber });
+            setSuccessMsg('¡Cuenta creada con éxito! Por favor, revisa tu correo electrónico para confirmar tu cuenta antes de iniciar sesión.');
+            setFormData({ fullName: '', email: '', password: '', phone: '' });
         } catch (err: any) {
             console.error("Error detallado de registro Supabase:", err);
             let errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
@@ -49,8 +52,15 @@ export const RegisterPage = () => {
                     {error && (
                         <div
                             className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-center gap-2 text-rose-400 text-sm">
-                            <AlertCircle size={16}/>
+                            <AlertCircle size={16} />
                             {error}
+                        </div>
+                    )}
+                    {successMsg && (
+                        <div
+                            className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-2 text-emerald-400 text-sm">
+                            <AlertCircle size={16} />
+                            {successMsg}
                         </div>
                     )}
 
@@ -58,14 +68,14 @@ export const RegisterPage = () => {
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-gray-300">Nombre Completo</label>
                             <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
                                 <input
                                     type="text"
                                     required
-                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition"
                                     placeholder="Juan Pérez"
                                     value={formData.fullName}
-                                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -78,11 +88,11 @@ export const RegisterPage = () => {
                                     <select
                                         value={countryCode}
                                         onChange={(e) => setCountryCode(e.target.value)}
-                                        className="w-full appearance-none bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-3 pr-8 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition cursor-pointer"
+                                        className="w-full appearance-none bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-3 pr-8 text-white focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition cursor-pointer"
                                     >
                                         {countries.map((country) => (
                                             <option key={country.iso} value={country.code}
-                                                    className="bg-gray-800 text-white">
+                                                className="bg-gray-800 text-white">
                                                 {country.flag} {country.code}
                                             </option>
                                         ))}
@@ -91,14 +101,15 @@ export const RegisterPage = () => {
 
                                 {/* Input de Número Local */}
                                 <div className="relative flex-1">
-                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                        size={20} />
                                     <input
                                         type="tel"
                                         required
-                                        className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                                        className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition"
                                         placeholder="300 123 4567"
                                         value={formData.phone}
-                                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -107,14 +118,14 @@ export const RegisterPage = () => {
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-gray-300">Correo Electrónico</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
                                 <input
                                     type="email"
                                     required
-                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition"
                                     placeholder="tu@email.com"
                                     value={formData.email}
-                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -122,15 +133,15 @@ export const RegisterPage = () => {
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-gray-300">Contraseña</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
                                 <input
                                     type="password"
                                     required
                                     minLength={6}
-                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                                    className="w-full bg-gray-900/50 border border-gray-600 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition"
                                     placeholder="Mínimo 6 caracteres"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -147,11 +158,12 @@ export const RegisterPage = () => {
                             <div className="text-sm leading-tight">
                                 <label htmlFor="terms" className="text-gray-300">
                                     He leído y acepto la <Link to="/privacy" target="_blank" rel="noopener noreferrer"
-                                                               className="text-emerald-400 hover:underline">Política de
-                                    Privacidad</Link> y la <Link to="/risk-disclaimer" target="_blank"
-                                                                 rel="noopener noreferrer"
-                                                                 className="text-emerald-400 hover:underline">Advertencia
-                                    de Riesgos</Link>.
+                                        className="text-[var(--primary)] hover:underline">Política
+                                        de
+                                        Privacidad</Link> y la <Link to="/risk-disclaimer" target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[var(--primary)] hover:underline">Advertencia
+                                        de Riesgos</Link>.
                                 </label>
                             </div>
                         </div>
@@ -159,16 +171,16 @@ export const RegisterPage = () => {
                         <button
                             type="submit"
                             disabled={loading || !agreed}
-                            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[var(--primary)] hover:opacity-90 text-[var(--primary-foreground)] font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Creando cuenta...' : <>Registrarme <ArrowRight size={20}/></>}
+                            {loading ? 'Creando cuenta...' : <>Registrarme <ArrowRight size={20} /></>}
                         </button>
                     </form>
 
                     <div className="mt-8 text-center">
                         <p className="text-gray-400 text-sm">
                             ¿Ya tienes cuenta?{' '}
-                            <Link to="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">Inicia
+                            <Link to="/login" className="text-[var(--primary)] hover:opacity-80 font-medium">Inicia
                                 Sesión</Link>
                         </p>
                     </div>

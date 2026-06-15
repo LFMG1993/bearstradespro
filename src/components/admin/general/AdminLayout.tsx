@@ -1,9 +1,22 @@
+import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import {LayoutDashboard, Users, Building2, CreditCard, LogOut, Layers} from 'lucide-react';
-import { authService } from '../../../services/auth.service';
+import {LayoutDashboard, Users, Building2, CreditCard, LogOut, Layers, Loader2, Activity} from 'lucide-react';
+import { useAuthStore } from '../../../stores/useAuthStore';
 
 export default function AdminLayout() {
     const location = useLocation();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await useAuthStore.getState().signOut();
+            window.location.href = '/login';
+        } catch (error) {
+            console.error(error);
+            setIsLoggingOut(false);
+        }
+    };
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
@@ -11,6 +24,7 @@ export default function AdminLayout() {
         { icon: Layers, label: 'Planes', path: '/admin/plans' },
         { icon: CreditCard, label: 'Suscripciones', path: '/admin/subscriptions' },
         { icon: Users, label: 'Usuarios Globales', path: '/admin/users' },
+        { icon: Activity, label: 'Señales', path: '/admin/signals' },
     ];
 
     return (
@@ -46,11 +60,12 @@ export default function AdminLayout() {
 
                 <div className="p-4 border-t border-slate-800">
                     <button
-                        onClick={() => authService.logout()}
-                        className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:text-rose-400 transition-colors"
+                        disabled={isLoggingOut}
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:text-rose-400 transition-colors disabled:opacity-50"
                     >
-                        <LogOut size={18} />
-                        <span className="text-sm">Cerrar Sesión</span>
+                        {isLoggingOut ? <Loader2 size={18} className="animate-spin" /> : <LogOut size={18} />}
+                        <span className="text-sm">{isLoggingOut ? 'Cerrando sesión...' : 'Cerrar Sesión'}</span>
                     </button>
                 </div>
             </aside>

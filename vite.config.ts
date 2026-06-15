@@ -30,6 +30,7 @@ export default defineConfig({
                 short_name: 'BearsTrades',
                 description: 'Plataforma de Trading y Señales en Vivo',
                 theme_color: '#0B1120',
+                start_url: '/login',
                 background_color: '#0B1120',
                 display: 'standalone',
                 orientation: 'portrait',
