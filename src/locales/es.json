@@ -1,0 +1,82 @@
+{
+  "landing": {
+    "hero": {
+      "title_1": "Opera con la",
+      "title_highlight": "Precisión de un Profesional",
+      "subtitle": "La plataforma definitiva de trading y gestión de riesgo. Únete a miles de traders y academias que ya potencian su rentabilidad con nuestras señales y herramientas automatizadas.",
+      "cta": "Comienza tu Prueba Gratis"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para ser rentable",
+      "signals_title": "Señales en Tiempo Real",
+      "signals_desc": "Recibe notificaciones push con puntos de entrada precisos, SL y TP. Copia y ejecuta en tu broker al instante.",
+      "risk_title": "Gestión de Riesgo Automatizada",
+      "risk_desc": "Nuestra calculadora inteligente define tu lotaje exacto para proteger tu capital en cada operación de Forex y Sintéticos.",
+      "kardex_title": "Bitácora y Kardex",
+      "kardex_desc": "Audita tu desempeño con un registro detallado de todas tus entradas, ganancias y pérdidas. Control absoluto de tus finanzas.",
+      "academy_title": "Academia Integrada",
+      "academy_desc": "Aprende desde cero. Accede a cursos, sesiones en vivo y material educativo exclusivo para miembros."
+    },
+    "b2b": {
+      "title": "La Solución Tecnológica Definitiva para Academias de Trading",
+      "subtitle": "Impulsa tu negocio. Nosotros ponemos la tecnología, tú te enfocas en enseñar y crecer tu comunidad.",
+      "point1_title": "Marca Blanca y Multi-tenant",
+      "point1_desc": "Tu propia academia con tus planes, colores y reglas, todo operando bajo nuestra infraestructura robusta.",
+      "point2_title": "Cobros Automatizados",
+      "point2_desc": "Integración directa con pasarelas de pago (MercadoPago) para suscripciones y membresías recurrentes.",
+      "point3_title": "Control Total de Usuarios",
+      "point3_desc": "Administra accesos, monitorea métricas de uso y entrega valor constante a tus estudiantes sin esfuerzo técnico."
+    },
+    "b2c": {
+      "title": "Traders Rentables, no Apostadores",
+      "subtitle": "Deja atrás la improvisación. Construye consistencia con herramientas de análisis avanzadas.",
+      "stat1_value": "90%",
+      "stat1_label": "Traders protegen mejor su capital usando nuestro gestor de riesgo",
+      "stat2_value": "+10k",
+      "stat2_label": "Señales enviadas y analizadas con precisión histórica",
+      "stat3_value": "24/7",
+      "stat3_label": "Monitoreo continuo de los mercados financieros e índices"
+    },
+    "ai_beginner": {
+      "badge": "Para Principiantes",
+      "title": "Domina el Trading desde Cero con Inteligencia Artificial",
+      "subtitle": "¿No sabes por dónde empezar? Nuestra plataforma está diseñada para acompañarte paso a paso, utilizando análisis impulsado por IA para mejorar tus entradas y proteger tu cuenta mientras aprendes.",
+      "point1_title": "Análisis Asistido por IA",
+      "point1_desc": "La inteligencia artificial filtra el ruido del mercado y valida las señales para que operes con mayor seguridad desde el primer día.",
+      "point2_title": "Acompañamiento Paso a Paso",
+      "point2_desc": "Sin términos complejos. Te indicamos exactamente dónde entrar, dónde salir y cuánto lotaje usar según tu capital.",
+      "point3_title": "Aprende Mientras Ganas",
+      "point3_desc": "Nuestra Academia Integrada te enseña los fundamentos mientras copias operativas de profesionales, acelerando tu curva de aprendizaje."
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "q1": "¿Qué son las señales de trading?",
+      "a1": "Las señales de trading son alertas o recomendaciones precisas enviadas por analistas expertos o algoritmos, que indican en qué momento comprar o vender un activo financiero (Forex, Índices Sintéticos, Criptomonedas) incluyendo precios de entrada (Entry), toma de ganancias (Take Profit) y límite de pérdida (Stop Loss).",
+      "q2": "¿Cómo funciona la gestión de riesgo automatizada?",
+      "a2": "Nuestra herramienta calcula automáticamente el lotaje adecuado para tu operación basándose en el tamaño de tu cuenta y el porcentaje exacto que estás dispuesto a arriesgar (ej. 1%). Así evitas quemar tu cuenta por sobreapalancamiento.",
+      "q3": "¿Sirve para operar Índices Sintéticos y Forex?",
+      "a3": "Sí, nuestra plataforma y señales cubren una amplia gama de mercados incluyendo el mercado de divisas (Forex), Índices Bursátiles e Índices Sintéticos (Boom, Crash, Volatility, Step).",
+      "q4": "¿Tengo que conectar mi broker a la plataforma?",
+      "a4": "Por seguridad, tú mantienes el control total de tu capital. Nosotros te enviamos la señal y los parámetros precisos de riesgo, y tú ejecutas la orden en tu broker de confianza (como Deriv, MetaTrader 4/5, etc).",
+      "q5": "¿Qué es la bitácora o Kardex de trading?",
+      "a5": "Es un registro digital automatizado (journaling) donde puedes documentar todas tus operaciones, analizar tu porcentaje de acierto (win rate) y descubrir patrones en tu operativa para mejorar tu consistencia a largo plazo.",
+      "q6": "Tengo una academia de trading, ¿puedo usar su plataforma?",
+      "a6": "¡Absolutamente! Ofrecemos un ecosistema B2B donde las academias pueden usar nuestra tecnología para gestionar a sus alumnos, vender suscripciones recurrentes automatizadas y enviar sus propias señales de trading en un entorno cerrado y profesional.",
+      "q7": "¿Cómo funcionan los pagos y suscripciones?",
+      "a7": "Aceptamos pagos seguros mediante pasarelas reconocidas como MercadoPago. Puedes optar por ciclos de facturación mensual, semestral o anual. Todo el acceso a señales y academia se activa inmediatamente tras el pago.",
+      "q8": "¿Necesito experiencia previa en trading?",
+      "a8": "No. Si eres principiante, nuestra 'Academia Integrada' te enseñará desde lo más básico hasta estrategias avanzadas. Mientras aprendes, puedes apalancarte de nuestras señales profesionales para buscar rentabilidad.",
+      "q9": "¿Qué pasa si pierdo operaciones?",
+      "a9": "El trading conlleva riesgos inherentes y las pérdidas son parte del proceso profesional. Nuestra promesa es proveer una gestión de riesgo estricta (Stop Loss calculado) para que las pérdidas siempre estén controladas y minimizadas matemáticamente.",
+      "q10": "¿Puedo cancelar mi suscripción en cualquier momento?",
+      "a10": "Sí. Puedes gestionar tu suscripción directamente desde tu perfil de usuario. No hay cláusulas de permanencia obligatoria, aunque recomendamos los planes anuales por el gran ahorro y compromiso a largo plazo."
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados.",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos y Condiciones",
+      "contact": "Contacto",
+      "disclaimer": "El trading de instrumentos financieros conlleva un alto nivel de riesgo y puede no ser adecuado para todos los inversores. Antes de decidirse a invertir, debe considerar cuidadosamente sus objetivos de inversión, nivel de experiencia y apetito por el riesgo."
+    }
+  }
+}

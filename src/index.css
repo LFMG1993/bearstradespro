@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 :root {
-    /* Tema Oscuro (Default) */
-    --background: #0B1120; /* Azul oscuro profundo */
-    --foreground: #e2e8f0; /* Gris claro (slate-200) */
-    --background-muted: #1e293b; /* Gris azulado (slate-800) */
-    --foreground-muted: #94a3b8; /* Gris medio (slate-400) */
-    --primary: #10b981; /* Esmeralda (emerald-500) */
-    --primary-foreground: #ffffff; /* Texto blanco */
-    --secondary: #1e293b; /* Gris azulado (slate-800) */
-    --secondary-hover: #334155; /* Gris más oscuro (slate-700) */
-    --border: #334155; /* Gris oscuro (slate-700) */
+    /* Tema Oscuro (Elegante) */
+    --background: #09090b; /* zinc-950 (Oscuro muy elegante) */
+    --foreground: #fafafa; /* zinc-50 (Blanco suave) */
+    --background-muted: #18181b; /* zinc-900 (Contraste sutil) */
+    --foreground-muted: #a1a1aa; /* zinc-400 (Gris elegante) */
+    --primary: #10b981; /* emerald-500 (Verde rentabilidad) */
+    --primary-foreground: #ffffff;
+    --secondary: #27272a; /* zinc-800 */
+    --secondary-hover: #3f3f46; /* zinc-700 */
+    --border: #27272a; /* zinc-800 */
 }
 
 html.light {
     /* Tema Claro */
-    --background: #ffffff; /* Blanco */
-    --foreground: #0f172a; /* Gris muy oscuro (slate-900) */
-    --background-muted: #f1f5f9; /* Gris muy claro (slate-100) */
-    --foreground-muted: #64748b; /* Gris medio (slate-500) */
-    --primary: #10b981; /* Esmeralda (emerald-500) */
+    --background: #ffffff;
+    --foreground: #09090b;
+    --background-muted: #f4f4f5; /* zinc-100 */
+    --foreground-muted: #71717a; /* zinc-500 */
+    --primary: #059669; /* emerald-600 */
     --primary-foreground: #ffffff;
-    --secondary: #f1f5f9; /* Gris muy claro (slate-100) */
-    --secondary-hover: #e2e8f0; /* Gris claro (slate-200) */
-    --border: #e2e8f0; /* Gris claro (slate-200) */
+    --secondary: #e4e4e7; /* zinc-200 */
+    --secondary-hover: #d4d4d8; /* zinc-300 */
+    --border: #e4e4e7; /* zinc-200 */
 }

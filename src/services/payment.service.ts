@@ -6,7 +6,7 @@ export const paymentService = {
      * @param planCode Código del plan (ej: 'pro')
      * @param organizationId ID de la organización
      */
-    async createPreference(planCode: string, organizationId: string) {
+    async createPreference(planCode: string, organizationId: string, couponCode?: string) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error("Debes iniciar sesión para suscribirte.");
 
@@ -20,6 +20,7 @@ export const paymentService = {
                 userId: session.user.id,
                 planCode,
                 organizationId,
+                couponCode,
                 redirectBaseUrl: window.location.origin
             })
         });

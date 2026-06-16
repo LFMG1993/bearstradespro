@@ -1,26 +1,20 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
-import {useAuthStore} from '../../stores/useAuthStore';
-import {useNavigate, useLocation} from 'react-router-dom';
-import {Lock, LogOut, CreditCard} from 'lucide-react';
-import {paymentService} from '../../services/payment.service';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Lock, LogOut, CreditCard } from 'lucide-react';
 
-export const AuthGuard = ({children}: { children: React.ReactNode }) => {
-    const {user, profile, isLoading, initialized, signOut} = useAuthStore();
+export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+    const { user, profile, isLoading, initialized, signOut } = useAuthStore();
     const [timeExpired, setTimeExpired] = useState(false);
-    const [paymentLoading, setPaymentLoading] = useState(false);
-    const [paymentError, setPaymentError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Rutas públicas que no requieren bloqueo nunca (ej: Login, Landing page pública)
-    const publicRoutes = ['/login', '/register', '/forgot-password', '/privacy', '/risk-disclaimer'];
+    const publicRoutes = ['/login', '/register', '/forgot-password', '/privacy', '/risk-disclaimer', '/pricing'];
 
     useEffect(() => {
-        // Si ya está logueado o es ruta pública, no hacemos nada
         if (user || publicRoutes.includes(location.pathname)) return;
 
-        // Verificar si ya expiró el tiempo en localStorage (para persistir entre recargas)
         const expiryTime = localStorage.getItem('guest_expiry');
         const now = Date.now();
 
@@ -29,14 +23,14 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
         } else {
             // Si no hay tiempo, seteamos 1 minuto desde ahora
             if (!expiryTime) {
-                const newExpiry = now + (60 * 1000); // 1 minuto
+                const newExpiry = now + (60 * 1000);
                 localStorage.setItem('guest_expiry', newExpiry.toString());
             }
 
             // Timer para bloquear en tiempo real
             const timeout = setTimeout(() => {
                 setTimeExpired(true);
-            }, 60 * 1000); // 1 minuto visual
+            }, 60 * 1000);
 
             return () => clearTimeout(timeout);
         }
@@ -45,25 +39,8 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
     // Si está cargando la sesión inicial, mostramos spinner o nada
     if (isLoading || !initialized) return null;
 
-    const handleSubscribe = async () => {
-        if (!profile?.organization_id) {
-            setPaymentError("No se encontró la organización.");
-            return;
-        }
-        setPaymentLoading(true);
-        setPaymentError(null);
-        try {
-            const data = await paymentService.createPreference('pro', profile.organization_id);
-            const url = data.sandbox_init_point || data.init_point;
-            window.location.href = url;
-        } catch (err: any) {
-            setPaymentError(err.message || "Error al iniciar el pago.");
-            setPaymentLoading(false);
-        }
-    };
-
     // 1. BLOQUEO POR SUSCRIPCIÓN VENCIDA
-    if (user && profile?.trial_ends_at && !location.pathname.startsWith('/admin')) {
+    if (user && profile?.trial_ends_at && !location.pathname.startsWith('/admin') && location.pathname !== '/pricing' && location.pathname !== '/checkout') {
         const trialEnd = new Date(profile.trial_ends_at);
         const now = new Date();
 
@@ -74,34 +51,27 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
                     <div className="bg-gray-800 p-8 rounded-2xl border border-rose-500/30 max-w-md w-full shadow-2xl">
                         <div
                             className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Lock className="text-rose-400" size={32}/>
+                            <Lock className="text-rose-400" size={32} />
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-2">Suscripción Vencida</h2>
                         <p className="text-gray-400 mb-8">
-                            Tu periodo de prueba finalizó el {trialEnd.toLocaleDateString()}.<br/>
-                            Suscríbete ahora para reactivar tu acceso inmediato.
+                            Tu suscripción finalizó el {trialEnd.toLocaleDateString()}.<br />
+                            Renueva ahora para reactivar tu acceso inmediato.
                         </p>
-                        {paymentError && (
-                            <div
-                                className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-sm">
-                                {paymentError}
-                            </div>
-                        )}
 
                         <div className="space-y-3">
                             <button
-                                onClick={handleSubscribe}
-                                disabled={paymentLoading}
-                                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => navigate('/pricing')}
+                                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2"
                             >
-                                <CreditCard size={18}/>
-                                {paymentLoading ? 'Procesando...' : 'Suscribirse con MercadoPago'}
+                                <CreditCard size={18} />
+                                Ver Planes y Renovar
                             </button>
                             <button
                                 onClick={() => signOut()}
                                 className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition flex items-center justify-center gap-2"
                             >
-                                <LogOut size={18}/> Cerrar Sesión
+                                <LogOut size={18} /> Cerrar Sesión
                             </button>
                         </div>
                     </div>
@@ -118,7 +88,7 @@ export const AuthGuard = ({children}: { children: React.ReactNode }) => {
                 <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 max-w-md w-full shadow-2xl">
                     <div
                         className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Lock className="text-emerald-400" size={32}/>
+                        <Lock className="text-emerald-400" size={32} />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">Tiempo de vista previa terminado</h2>
                     <p className="text-gray-400 mb-8">

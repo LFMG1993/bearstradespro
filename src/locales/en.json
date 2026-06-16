@@ -1,0 +1,82 @@
+{
+  "landing": {
+    "hero": {
+      "title_1": "Trade with",
+      "title_highlight": "Professional Precision",
+      "subtitle": "The ultimate trading and risk management platform. Join thousands of traders and academies that are already boosting their profitability with our signals and automated tools.",
+      "cta": "Start Your Free Trial"
+    },
+    "features": {
+      "title": "Everything you need to be profitable",
+      "signals_title": "Real-Time Signals",
+      "signals_desc": "Get push notifications with precise entry points, SL and TP. Copy and execute in your broker instantly.",
+      "risk_title": "Automated Risk Management",
+      "risk_desc": "Our smart calculator defines your exact lot size to protect your capital in every Forex and Synthetics trade.",
+      "kardex_title": "Trading Journal & Kardex",
+      "kardex_desc": "Audit your performance with a detailed record of all your entries, wins, and losses. Absolute control of your finances.",
+      "academy_title": "Integrated Academy",
+      "academy_desc": "Learn from scratch. Access courses, live sessions, and exclusive educational material for members."
+    },
+    "b2b": {
+      "title": "The Ultimate Tech Solution for Trading Academies",
+      "subtitle": "Boost your business. We provide the technology, you focus on teaching and growing your community.",
+      "point1_title": "White Label & Multi-tenant",
+      "point1_desc": "Your own academy with your plans, colors, and rules, all running on our robust infrastructure.",
+      "point2_title": "Automated Billing",
+      "point2_desc": "Direct integration with payment gateways (MercadoPago) for subscriptions and recurring memberships.",
+      "point3_title": "Total User Control",
+      "point3_desc": "Manage access, monitor usage metrics, and deliver constant value to your students without technical effort."
+    },
+    "b2c": {
+      "title": "Profitable Traders, Not Gamblers",
+      "subtitle": "Leave improvisation behind. Build consistency with advanced analysis tools.",
+      "stat1_value": "90%",
+      "stat1_label": "Traders protect their capital better using our risk manager",
+      "stat2_value": "+10k",
+      "stat2_label": "Signals sent and analyzed with historical precision",
+      "stat3_value": "24/7",
+      "stat3_label": "Continuous monitoring of financial markets and indices"
+    },
+    "ai_beginner": {
+      "badge": "For Beginners",
+      "title": "Master Trading from Scratch with AI",
+      "subtitle": "Don't know where to start? Our platform is designed to guide you step-by-step, using AI-driven analysis to improve your entries and protect your account while you learn.",
+      "point1_title": "AI-Assisted Analysis",
+      "point1_desc": "Artificial intelligence filters market noise and validates signals so you can trade with greater confidence from day one.",
+      "point2_title": "Step-by-Step Guidance",
+      "point2_desc": "No complex jargon. We tell you exactly where to enter, where to exit, and what lot size to use based on your capital.",
+      "point3_title": "Learn While You Earn",
+      "point3_desc": "Our Integrated Academy teaches you the fundamentals while you copy professional trades, accelerating your learning curve."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "What are trading signals?",
+      "a1": "Trading signals are precise alerts or recommendations sent by expert analysts or algorithms, indicating when to buy or sell a financial asset (Forex, Synthetic Indices, Cryptocurrencies) including Entry prices, Take Profit, and Stop Loss.",
+      "q2": "How does automated risk management work?",
+      "a2": "Our tool automatically calculates the appropriate lot size for your trade based on your account size and the exact percentage you are willing to risk (e.g. 1%). This prevents you from blowing your account due to overleveraging.",
+      "q3": "Does it work for trading Synthetic Indices and Forex?",
+      "a3": "Yes, our platform and signals cover a wide range of markets including the foreign exchange market (Forex), Stock Indices, and Synthetic Indices (Boom, Crash, Volatility, Step).",
+      "q4": "Do I have to connect my broker to the platform?",
+      "a4": "For security, you maintain total control of your capital. We send you the signal and precise risk parameters, and you execute the order in your trusted broker (like Deriv, MetaTrader 4/5, etc).",
+      "q5": "What is the trading journal or Kardex?",
+      "a5": "It is an automated digital record (journaling) where you can document all your trades, analyze your win rate, and discover patterns in your trading to improve your long-term consistency.",
+      "q6": "I have a trading academy, can I use your platform?",
+      "a6": "Absolutely! We offer a B2B ecosystem where academies can use our technology to manage their students, sell automated recurring subscriptions, and send their own trading signals in a closed and professional environment.",
+      "q7": "How do payments and subscriptions work?",
+      "a7": "We accept secure payments through recognized gateways like MercadoPago. You can choose monthly, semi-annual, or annual billing cycles. All access to signals and the academy is activated immediately after payment.",
+      "q8": "Do I need previous trading experience?",
+      "a8": "No. If you are a beginner, our 'Integrated Academy' will teach you from the basics to advanced strategies. While you learn, you can leverage our professional signals to seek profitability.",
+      "q9": "What happens if I lose trades?",
+      "a9": "Trading carries inherent risks and losses are part of the professional process. Our promise is to provide strict risk management (calculated Stop Loss) so that losses are always controlled and mathematically minimized.",
+      "q10": "Can I cancel my subscription at any time?",
+      "a10": "Yes. You can manage your subscription directly from your user profile. There are no mandatory permanence clauses, although we recommend annual plans for the great savings and long-term commitment."
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms and Conditions",
+      "contact": "Contact Us",
+      "disclaimer": "Trading financial instruments carries a high level of risk and may not be suitable for all investors. Before deciding to invest, you should carefully consider your investment objectives, level of experience, and risk appetite."
+    }
+  }
+}

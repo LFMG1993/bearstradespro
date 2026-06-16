@@ -1,15 +1,16 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, ShieldOff, UserX, Info } from 'lucide-react';
 
 export const RiskDisclaimerPage = () => {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
-                    <Link to="/register" className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
                         <ArrowLeft size={24} />
-                    </Link>
+                    </button>
                     <div>
                         <h1 className="text-3xl font-bold text-white">Advertencia de Riesgos y Descargo de Responsabilidad</h1>
                         <p className="text-rose-400 text-sm">Lea atentamente antes de continuar</p>

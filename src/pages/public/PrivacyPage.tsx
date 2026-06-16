@@ -1,16 +1,17 @@
-import {Link} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {ArrowLeft, Shield, Lock, Eye, Server, Mail, Database, Bell} from 'lucide-react';
 
 export const PrivacyPage = () => {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
 
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
-                    <Link to="/register" className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
                         <ArrowLeft size={24}/>
-                    </Link>
+                    </button>
                     <div>
                         <h1 className="text-3xl font-bold text-white">Política de Privacidad</h1>
                         <p className="text-emerald-400 text-sm">Última actualización: 26 de Enero de 2026</p>
@@ -146,9 +147,9 @@ export const PrivacyPage = () => {
                         </h2>
                         <p className="mb-2">Si tiene alguna pregunta o sugerencia sobre nuestra Política de Privacidad,
                             no dude en contactarnos en:</p>
-                        <a href="mailto:bearspro@proton.me"
+                        <a href="mailto:contacto@bearstrade.org"
                            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition font-medium">
-                            <Mail size={16}/> bearspro@proton.me
+                            <Mail size={16}/> contacto@bearstrade.org
                         </a>
                     </section>
 

@@ -8,20 +8,21 @@ interface SEOProps {
     ogImage?: string;
     noIndex?: boolean;
     keywords?: string;
+    customSchema?: any;
 }
 
 /**
  * Componente reutilizable para gestionar las etiquetas de SEO de cada página.
  * Proporciona valores por defecto y permite sobreescribirlos.
  */
-export const SEO = ({title, description, canonicalUrl, ogImage, noIndex, keywords}: SEOProps) => {
+export const SEO = ({title, description, canonicalUrl, ogImage, noIndex, keywords, customSchema}: SEOProps) => {
     const siteName = "Bears Trades Pro";
     const fullTitle = `${title} | ${siteName}`;
     const defaultOgImage = "https://bearstrade.org/og-image.jpg";
     const finalOgImage = ogImage || defaultOgImage;
     const siteUrl = "https://bearstrade.org";
     const finalCanonicalUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
-    const defaultKeywords = "trading, señales de forex, indices sinteticos, academia de trading, inversiones online, copytrading";
+    const defaultKeywords = "trading, señales de forex, indices sinteticos, academia de trading, inversiones online, copytrading, gestión de riesgo, prop firms, software para academias, automatización";
     const finalKeywords = keywords ? `${keywords}, ${defaultKeywords}` : defaultKeywords;
 
 
@@ -72,6 +73,11 @@ export const SEO = ({title, description, canonicalUrl, ogImage, noIndex, keyword
             <script type="application/ld+json">
                 {JSON.stringify(businessSchema)}
             </script>
+            {customSchema && (
+                <script type="application/ld+json">
+                    {JSON.stringify(customSchema)}
+                </script>
+            )}
         </Helmet>
     );
 };

@@ -2,10 +2,13 @@ export interface Plan {
     id: string;
     name: string;
     code: string;
-    price: number; // Lo queremos como número para cálculos
+    description?: string;
+    price: number;
     currency?: string;
-    features: Record<string, any>; // Lo queremos como objeto real
-    organizationId: string; // camelCase
+    interval: string;
+    interval_count: number;
+    features: Record<string, any>;
+    organizationId: string;
     organizationName?: string;
     created_at: string;
 }

@@ -1,35 +1,38 @@
-import {useEffect, useState} from "react";
-import {Toaster} from "react-hot-toast";
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {Navigate} from 'react-router-dom';
-import {useAuthStore} from './stores/useAuthStore';
-import {AuthGuard} from './components/auth/AuthGuard';
-import {SuperAdminGuard} from "./components/auth/SuperAdminGuard.tsx";
-import {Analytics} from "./components/general/Analytics.tsx";
-import {MainLayout} from "./components/general/MainLayout.tsx";
+import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Navigate } from 'react-router-dom';
+import { useAuthStore } from './stores/useAuthStore';
+import { AuthGuard } from './components/auth/AuthGuard';
+import { SuperAdminGuard } from "./components/auth/SuperAdminGuard.tsx";
+import { Analytics } from "./components/general/Analytics.tsx";
+import { MainLayout } from "./components/general/MainLayout.tsx";
 import LandingPage from "./pages/landing/LandingPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
-import {SignalsPage} from "./pages/SignalsPage.tsx";
-import {PerformancePage} from "./pages/PerformancePage.tsx";
-import {LoginPage} from "./pages/LoginPage.tsx";
-import {RegisterPage} from "./pages/RegisterPage.tsx";
-import {PrivacyPage} from "./pages/PrivacyPage.tsx";
-import {RiskDisclaimerPage} from "./pages/RiskDisclaimerPage.tsx";
-import {PaymentResultPage} from "./pages/PaymentResultPage.tsx";
-import {ProfilePage} from "./pages/ProfilePage.tsx";
-import {TradingPlanPage} from "./pages/TradingPlanPage.tsx"
-import {NotificationsProvider} from "./context/NotificationsContext.tsx";
+import { SignalsPage } from "./pages/SignalsPage.tsx";
+import { PerformancePage } from "./pages/PerformancePage.tsx";
+import { LoginPage } from "./pages/LoginPage.tsx";
+import { RegisterPage } from "./pages/RegisterPage.tsx";
+import { PrivacyPage } from "./pages/public/PrivacyPage.tsx";
+import { RiskDisclaimerPage } from "./pages/public/RiskDisclaimerPage.tsx";
+import { TermsAndConditionsPage } from "./pages/public/TermsAndConditionsPage.tsx";
+import { PaymentResultPage } from "./pages/PaymentResultPage.tsx";
+import { ProfilePage } from "./pages/ProfilePage.tsx";
+import { TradingPlanPage } from "./pages/TradingPlanPage.tsx"
+import { PricingPage } from "./pages/public/PricingPage.tsx";
+import { CheckoutPage } from "./pages/public/CheckoutPage.tsx";
+import { NotificationsProvider } from "./context/NotificationsContext.tsx";
 import AdminLayout from "./components/admin/general/AdminLayout.tsx";
-import {AdminDashboard} from "./pages/admin/DashboardPage.tsx";
-import {AdminLoginPage} from "./pages/admin/AdminLoginPage.tsx";
-import {AdminUsersPage} from "./pages/admin/AdminUsersPage.tsx";
-import {AdminPlansPage} from "./pages/admin/AdminPlansPage.tsx";
-import {AdminSubscriptionsPage} from "./pages/admin/AdminSubscriptionsPage.tsx";
-import {AdminOrganizationsPage} from "./pages/admin/AdminOrganizationsPage.tsx";
-import {AdminSignalsPage} from "./pages/admin/AdminSignalsPage.tsx";
+import { AdminDashboard } from "./pages/admin/DashboardPage.tsx";
+import { AdminLoginPage } from "./pages/admin/AdminLoginPage.tsx";
+import { AdminUsersPage } from "./pages/admin/AdminUsersPage.tsx";
+import { AdminPlansPage } from "./pages/admin/AdminPlansPage.tsx";
+import { AdminSubscriptionsPage } from "./pages/admin/AdminSubscriptionsPage.tsx";
+import { AdminOrganizationsPage } from "./pages/admin/AdminOrganizationsPage.tsx";
+import { AdminSignalsPage } from "./pages/admin/AdminSignalsPage.tsx";
 
-const PlaceholderPage = ({title}: { title: string }) => (
+const PlaceholderPage = ({ title }: { title: string }) => (
     <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
         <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
         <p>Próximamente disponible</p>
@@ -53,7 +56,6 @@ function App() {
         const hostname = window.location.hostname;
         if (hostname.startsWith('admin')) return 'admin';
         if (hostname.startsWith('app')) return 'app';
-        // if (import.meta.env.DEV && hostname.startsWith('localhost')) return 'app';
         return 'landing';
     });
 
@@ -70,27 +72,27 @@ function App() {
                     <BrowserRouter>
                         <Routes>
                             {/* Redirección raíz: Si entra al dominio admin, va al dashboard */}
-                            <Route path="/" element={<Navigate to="/admin" replace/>}/>
+                            <Route path="/" element={<Navigate to="/admin" replace />} />
                             {/* Login Administrativo */}
-                            <Route path="/admin/login" element={<AdminLoginPage/>}/>
-                            <Route path="/login" element={<Navigate to="/admin/login" replace/>}/>
+                            <Route path="/admin/login" element={<AdminLoginPage />} />
+                            <Route path="/login" element={<Navigate to="/admin/login" replace />} />
                             {/* Rutas Protegidas del Admin */}
-                            <Route path="/admin" element={<SuperAdminGuard><AdminLayout/></SuperAdminGuard>}>
-                                <Route index element={<AdminDashboard/>}/>
-                                <Route path="users" element={<AdminUsersPage/>}/>
-                                <Route path="plans" element={<AdminPlansPage/>}/>
-                                <Route path="subscriptions" element={<AdminSubscriptionsPage/>}/>
-                                <Route path="orgs" element={<AdminOrganizationsPage/>}/>
-                                <Route path="signals" element={<AdminSignalsPage/>}/>
+                            <Route path="/admin" element={<SuperAdminGuard><AdminLayout /></SuperAdminGuard>}>
+                                <Route index element={<AdminDashboard />} />
+                                <Route path="users" element={<AdminUsersPage />} />
+                                <Route path="plans" element={<AdminPlansPage />} />
+                                <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+                                <Route path="orgs" element={<AdminOrganizationsPage />} />
+                                <Route path="signals" element={<AdminSignalsPage />} />
                             </Route>
                             {/* Cualquier ruta desconocida en este dominio va al login admin */}
-                            <Route path="*" element={<Navigate to="/admin/login" replace/>}/>
+                            <Route path="*" element={<Navigate to="/admin/login" replace />} />
                         </Routes>
                         <Toaster
                             position="top-right"
                             reverseOrder={false}
                             toastOptions={{
-                                style: {background: '#333', color: '#fff'},
+                                style: { background: '#333', color: '#fff' },
                             }}
                         />
                     </BrowserRouter>
@@ -107,29 +109,32 @@ function App() {
                     <BrowserRouter>
                         <Routes>
                             {/* Si alguien intenta entrar a /admin en la app de usuarios, lo mandamos a su dominio correcto */}
-                            <Route path="/admin/*" element={<RedirectToAdmin/>}/>
+                            <Route path="/admin/*" element={<RedirectToAdmin />} />
                             <Route path="/*" element={
                                 <AuthGuard>
-                                    <Analytics/>
+                                    <Analytics />
                                     <Routes>
                                         {/* Rutas Publícas */}
-                                        <Route path="/login" element={<LoginPage/>}/>
-                                        <Route path="/register" element={<RegisterPage/>}/>
-                                        <Route path="/privacy" element={<PrivacyPage/>}/>
-                                        <Route path="/risk-disclaimer" element={<RiskDisclaimerPage/>}/>
+                                        <Route path="/login" element={<LoginPage />} />
+                                        <Route path="/register" element={<RegisterPage />} />
+                                        <Route path="/privacy" element={<PrivacyPage />} />
+                                        <Route path="/risk-disclaimer" element={<RiskDisclaimerPage />} />
+                                        <Route path="/terms" element={<TermsAndConditionsPage />} />
+                                        <Route path="/pricing" element={<PricingPage />} />
                                         {/* Rutas de Retorno de Pagos */}
-                                        <Route path="/payment/success" element={<PaymentResultPage status="success"/>}/>
-                                        <Route path="/payment/failure" element={<PaymentResultPage status="failure"/>}/>
-                                        <Route path="/payment/pending" element={<PaymentResultPage status="pending"/>}/>
+                                        <Route path="/payment/success" element={<PaymentResultPage status="success" />} />
+                                        <Route path="/payment/failure" element={<PaymentResultPage status="failure" />} />
+                                        <Route path="/payment/pending" element={<PaymentResultPage status="pending" />} />
                                         {/* Zona de Usuario */}
-                                        <Route path="/" element={<MainLayout/>}>
-                                            <Route index element={<HomePage/>}/>
-                                            <Route path="signals" element={<SignalsPage/>}/>
-                                            <Route path="trade" element={<TradingPlanPage/>}/>
-                                            <Route path="academy" element={<PlaceholderPage title="Academia"/>}/>
-                                            <Route path="profile" element={<ProfilePage/>}/>
-                                            <Route path="performance" element={<PerformancePage/>}/>
+                                        <Route path="/" element={<AuthGuard><MainLayout /></AuthGuard>}>
+                                            <Route index element={<HomePage />} />
+                                            <Route path="signals" element={<SignalsPage />} />
+                                            <Route path="trade" element={<TradingPlanPage />} />
+                                            <Route path="academy" element={<PlaceholderPage title="Academia" />} />
+                                            <Route path="profile" element={<ProfilePage />} />
+                                            <Route path="performance" element={<PerformancePage />} />
                                         </Route>
+                                        <Route path="/checkout" element={<AuthGuard><CheckoutPage /></AuthGuard>} />
                                     </Routes>
                                     <Toaster
                                         position="top-right"
@@ -142,7 +147,7 @@ function App() {
                                         }}
                                     />
                                 </AuthGuard>
-                            }/>
+                            } />
                         </Routes>
                     </BrowserRouter>
                 </NotificationsProvider>
@@ -155,13 +160,16 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="*" element={<LandingPage/>}/>
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/risk-disclaimer" element={<RiskDisclaimerPage />} />
+                    <Route path="/terms" element={<TermsAndConditionsPage />} />
+                    <Route path="*" element={<LandingPage />} />
                 </Routes>
                 <Toaster
                     position="top-right"
                     reverseOrder={false}
                     toastOptions={{
-                        style: {background: '#333', color: '#fff'},
+                        style: { background: '#333', color: '#fff' },
                     }}
                 />
             </BrowserRouter>
