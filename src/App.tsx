@@ -70,6 +70,7 @@ function App() {
             <QueryClientProvider client={queryClient}>
                 <NotificationsProvider>
                     <BrowserRouter>
+                        <Analytics />
                         <Routes>
                             {/* Redirección raíz: Si entra al dominio admin, va al dashboard */}
                             <Route path="/" element={<Navigate to="/admin" replace />} />
@@ -107,12 +108,12 @@ function App() {
             <QueryClientProvider client={queryClient}>
                 <NotificationsProvider>
                     <BrowserRouter>
+                        <Analytics />
                         <Routes>
                             {/* Si alguien intenta entrar a /admin en la app de usuarios, lo mandamos a su dominio correcto */}
                             <Route path="/admin/*" element={<RedirectToAdmin />} />
                             <Route path="/*" element={
                                 <AuthGuard>
-                                    <Analytics />
                                     <Routes>
                                         {/* Rutas Publícas */}
                                         <Route path="/login" element={<LoginPage />} />
@@ -159,6 +160,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
+                <Analytics />
                 <Routes>
                     <Route path="/privacy" element={<PrivacyPage />} />
                     <Route path="/risk-disclaimer" element={<RiskDisclaimerPage />} />
