@@ -5,18 +5,29 @@ export const LandingFooter = () => {
     const appUrl = import.meta.env.DEV ? 'http://app.localhost:5173' : 'https://app.bearstrade.org';
 
     return (
-        <footer className="bg-[var(--background-muted)] border-t border-[var(--border)] py-8 px-4">
-            <div className="container mx-auto text-center text-[var(--foreground-muted)]">
+        <footer className="bg-(--background-muted) border-t border-(--border) py-8 px-4">
+            <div className="container mx-auto text-center text-(--foreground-muted)">
                 <p>&copy; {new Date().getFullYear()} Bears Trades Pro. {t('landing.footer.rights')}</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6">
-                    <a href={`${appUrl}/privacy`} className="hover:text-[var(--primary)] transition text-sm">{t('landing.footer.privacy')}</a>
-                    <a href={`${appUrl}/terms`} className="hover:text-[var(--primary)] transition text-sm">{t('landing.footer.terms')}</a>
-                    <a href={`${appUrl}/risk-disclaimer`} className="hover:text-[var(--primary)] transition text-sm">Aviso de Riesgo</a>
-                    <a href="mailto:contacto@bearstrade.org" className="hover:text-[var(--primary)] transition text-sm">{t('landing.footer.contact')}</a>
+                    <a href={`${appUrl}/privacy`} className="hover:text-(--primary) transition text-sm">{t('landing.footer.privacy')}</a>
+                    <a href={`${appUrl}/terms`} className="hover:text-(--primary) transition text-sm">{t('landing.footer.terms')}</a>
+                    <a href={`${appUrl}/risk-disclaimer`} className="hover:text-(--primary) transition text-sm">Aviso de Riesgo</a>
+                    <a href="mailto:contacto@bearstrade.org" className="hover:text-(--primary) transition text-sm">{t('landing.footer.contact')}</a>
                 </div>
                 <div className="mt-6 text-xs max-w-3xl mx-auto leading-relaxed">
                     <p>{t('landing.footer.disclaimer')}</p>
                 </div>
+                <p className="mt-4 text-xs">
+                    {t('landing.footer.designedBy')}{' '}
+                    <a
+                        href="https://molink.com.co/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-(--primary) hover:underline transition-colors"
+                    >
+                        Molink Tecnologia
+                    </a>
+                </p>
             </div>
         </footer>
     );

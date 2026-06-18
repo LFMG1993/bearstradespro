@@ -8,11 +8,13 @@ import {PushNotificationToggler} from "./PushNotificationToggler.tsx";
 import {InstallPWA} from "./InstallPWA.tsx";
 import {UpdatePWA} from "./UpdatePWA.tsx";
 import bearsBlack from '../../assets/bears_black.gif';
+import {useTranslation} from 'react-i18next';
 
 export const MainLayout = () => {
     const {user, profile} = useAuthStore();
     const navigate = useNavigate();
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const {t} = useTranslation();
 
     // Notificaciones
     const {unreadCount, notifications, markAllAsRead} = useNotifications();
@@ -151,6 +153,19 @@ export const MainLayout = () => {
                 <main className="px-5 pt-6 pb-32 space-y-8">
                     <Outlet/>
                 </main>
+                <footer className="px-5 pb-4 text-center text-gray-600 text-xs border-t border-gray-800 pt-4">
+                    <p>
+                        {t('landing.footer.designedBy')}{' '}
+                        <a
+                            href="https://molink.com.co/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-500 hover:text-emerald-400 hover:underline transition-colors"
+                        >
+                            Molink Tecnologia
+                        </a>
+                    </p>
+                </footer>
                 <MobileDock/>
                 <InstallPWA/>
                 <UpdatePWA/>
